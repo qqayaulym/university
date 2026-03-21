@@ -1,0 +1,39 @@
+body {
+    background: rgb(248, 250, 244);
+}
+
+.authForm {
+    width: 320px;
+    margin: 100px auto;
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.authTitle {
+    text-align: center;
+}
+
+.authInput {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.authButton {
+    width: 100%;
+    padding: 10px;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.authLink {
+  margin-top: 10px;
+  text-align: center;
+}
