@@ -1,4 +1,5 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -10,10 +11,9 @@ const MainPage = () => {
 
   return (
     <div className="main">
-      <h1>Главная страница</h1>
-      <p>Вы успешно вошли в систему 🎉</p>
-
-      <button onClick={handleLogout}>Выйти</button>
+      <h2>Типа пр</h2>
+      <button className="activitiesButton" onClick={() => navigate("/activities")}>Перейти к активам</button>
+      <button><a href="https://astanait.edu.kz/">Перейти на сайт айту</a></button>
     </div>
   );
 };

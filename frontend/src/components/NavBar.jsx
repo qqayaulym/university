@@ -7,9 +7,9 @@ const NavBar = () => {
 
     const pages = [
         {name: 'Менің парақшам', to: '/myprofile'},
-        {name: 'Іс-шаралар', to: './activities'},
-        {name: 'Менің іс-шараларым', to: './myactivities'},
-        {name: 'Баптаулар', to: './settings'},
+        {name: 'Іс-шаралар', to: '/activities'},
+        {name: 'Менің іс-шараларым', to: '/myactivities'},
+        {name: 'Баптаулар', to: '/settings'},
     ]
 
     const LogOut = () => {
