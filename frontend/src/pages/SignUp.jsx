@@ -1,17 +1,19 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import axios from "axios"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import "../styles/auth.css"
 
 const SignUp = () => {
-    const [form, setform] = useState({
+    const navigate = useNavigate()
+
+    const [form, setForm] = useState({
         username: "",
         email: "",
         password: ""
     })
 
     const handleChange = (e) => {
-        setform({
+        setForm({
             ...form,
             [e.target.name]: e.target.value
         })
@@ -34,17 +36,24 @@ const SignUp = () => {
             console.log(err.response?.data || err.message);
             alert(err.response?.data?.message || "Қате тіркеу");
         }
-    };
+    }
+
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        if (token) {
+            navigate("/")
+        }
+    }, [navigate])
 
     return (
         <form onSubmit={handleSubmit} className="authForm">
             <h2 className="authTitle">Тіркелу</h2>
-            <input className="authInput" name="username" onChange={handleChange} placeholder="Username" />
-            <input className="authInput" name="email" onChange={handleChange} placeholder="Email" />
-            <input className="authInput" name="password" type="password" onChange={handleChange} placeholder="Password" />
-            <button className="authButton" type="sumbit">Тіркелу</button>
+            <input className="authInput" value={form.username} name="username" onChange={handleChange} placeholder="Username" />
+            <input className="authInput" value={form.email} name="email" onChange={handleChange} placeholder="Email" />
+            <input className="authInput" value={form.password} name="password" type="password" onChange={handleChange} placeholder="Password" />
+            <button className="authButton" type="submit">Тіркелу</button>
             <p className="authLink">
-                Аккаунтыңыз бар ма? <Link to="/">Кіру</Link>
+                Аккаунтыңыз бар ма? <Link to="/login">Кіру</Link>
             </p>
         </form>
     )
