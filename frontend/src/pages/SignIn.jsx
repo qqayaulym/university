@@ -48,6 +48,7 @@ const SignIn = () => {
         <form onSubmit={handleSubmit} className="authForm">
             <h2 className="authTitle">Логин</h2>
 
+            <label htmlFor="email" className="formLabel">Email:</label>
             <input
                 name="email"
                 value={form.email}
@@ -56,6 +57,7 @@ const SignIn = () => {
                 className="authInput"
             />
 
+            <label htmlFor="password" className="formLabel">Құпиясөз:</label>
             <input
                 name="password"
                 value={form.password}
@@ -67,7 +69,7 @@ const SignIn = () => {
 
             <button type="submit" className="authButton" disabled={!form.email || !form.password}>Sign In</button>
             <p className="authLink">
-                Аккаунтыңыз жоқ па? <Link to="/register">Тіркеліңіз</Link>
+                Аккаунтыңыз жоқ па? <Link to="/register" className="authLink">Тіркеліңіз</Link>
             </p>
     </form>
     )

@@ -48,9 +48,13 @@ const SignUp = () => {
     return (
         <form onSubmit={handleSubmit} className="authForm">
             <h2 className="authTitle">Тіркелу</h2>
+            <label htmlFor="username" className="formLabel">Юзернейм:</label>
             <input className="authInput" value={form.username} name="username" onChange={handleChange} placeholder="Username" />
+            <label htmlFor="email" className="formLabel">Email:</label>
             <input className="authInput" value={form.email} name="email" onChange={handleChange} placeholder="Email" />
+            <label htmlFor="password" className="formLabel">Құпиясөз:</label>
             <input className="authInput" value={form.password} name="password" type="password" onChange={handleChange} placeholder="Password" />
+            <p className="autConfig">Создавая учетную запись, вы соглашаетесь с нашим <a href="#" className="autConfig">Условия и конфиденциальность</a>.</p>
             <button className="authButton" type="submit">Тіркелу</button>
             <p className="authLink">
                 Аккаунтыңыз бар ма? <Link to="/login">Кіру</Link>

@@ -1,39 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
-    background: rgb(248, 250, 244);
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(circle at top, #ffffff 0%, #f0f7ff 50%, #e2e8f0 100%);
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding: clamp(15px, 5vw, 40px);
 }
 
 .authForm {
-    width: 320px;
-    margin: 100px auto;
-    padding: 25px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    /* Адаптивная ширина: на мобилках почти во весь экран, на десктопе компактно */
+    max-width: clamp(320px, 95vw, 440px);
+    
+    /* Адаптивные внутренние отступы */
+    padding: clamp(30px, 8vw, 55px);
+    
+    background: #ffffff;
+    border-radius: clamp(24px, 5vw, 40px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 30px 60px -12px rgba(185, 193, 208, 0.3);
+    
+    animation: iosAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
 }
 
 .authTitle {
     text-align: center;
+    color: #1e293b;
+    margin-bottom: clamp(25px, 6vh, 45px);
+    /* Шрифт растет вместе с экраном */
+    font-size: clamp(26px, 4.5vw, 34px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+}
+
+.formLabel {
+    display: block;
+    margin-bottom: 10px;
+    margin-left: 8px;
+    font-weight: 600;
+    color: #64748b;
+    font-size: clamp(12px, 1.5vw, 13px);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 .authInput {
     width: 100%;
-    margin-bottom: 12px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    margin-bottom: clamp(18px, 3vh, 28px);
+    padding: clamp(14px, 2.5vw, 18px) 22px;
+    background: #f8fafc;
+    border: 2px solid #f1f5f9;
+    border-radius: 18px;
+    /* 16px — критично для мобилок, чтобы не было авто-зума в Safari */
+    font-size: 16px; 
+    color: #0f172a;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.authInput:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Фикс автозаполнения */
+.authInput:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 50px #f8fafc inset !important;
 }
 
 .authButton {
     width: 100%;
-    padding: 10px;
-    background: #000;
-    color: white;
+    padding: clamp(16px, 3vw, 20px);
+    background: linear-gradient(145deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
     border: none;
-    border-radius: 6px;
+    border-radius: 18px;
+    font-size: clamp(16px, 2vw, 18px);
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.2);
+    margin-top: 5px;
+}
+
+.authButton:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 20px 35px rgba(37, 99, 235, 0.3);
+    filter: brightness(1.1);
+}
+
+.authButton:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.autConfig {
+    margin-top: clamp(25px, 5vh, 40px);
+    text-align: center;
+    line-height: 1.5;
+    padding: 0 5px;
 }
 
 .authLink {
-  margin-top: 10px;
-  text-align: center;
+    text-decoration: none;
+    color: #3b82f6;
+    font-size: clamp(13px, 1.8vw, 14px);
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.authLink:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+@keyframes iosAppear {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px) scale(0.98); 
+        filter: blur(10px);
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+        filter: blur(0);
+    }
+}
+
+/* Планшетная и мобильная оптимизация */
+@media (max-width: 768px) {
+    .authForm {
+        border-radius: 30px;
+    }
+}
+
+@media (max-width: 400px) {
+    body {
+        padding: 10px;
+    }
+    .authForm {
+        padding: 25px 20px;
+    }
 }
