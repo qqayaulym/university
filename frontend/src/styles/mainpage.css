@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(20px, 5vw, 60px);
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.mainH2 {
+    color: #1e293b;
+    font-size: clamp(24px, 5vw, 42px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    letter-spacing: -0.04em;
+}
+
+.mainP {
+    color: #64748b;
+    font-size: clamp(16px, 2vw, 18px);
+    line-height: 1.6;
+    max-width: 700px;
+    margin-bottom: 40px;
+}
+
+.mainPhoto {
+    width: 100%;
+    max-width: 800px;
+    height: clamp(200px, 40vh, 450px);
+    background: #e2e8f0; /* Плейсхолдер, пока нет фото */
+    border-radius: clamp(20px, 4vw, 40px);
+    object-fit: cover;
+    margin-bottom: 50px;
+    box-shadow: 0 20px 40px rgba(185, 193, 208, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.activitiesButton, .aituButton {
+    width: 100%;
+    max-width: 320px;
+    padding: 18px 30px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border: none;
+    margin: 10px 0;
+}
+
+.activitiesButton {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 15px 30px rgba(37, 99, 235, 0.25);
+}
+
+.activitiesButton:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(37, 99, 235, 0.35);
+}
+
+.aituButton {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 20px rgba(185, 193, 208, 0.2);
+}
+
+.aituButton a {
+    text-decoration: none;
+    color: #475569;
+    display: block;
+}
+
+.aituButton:hover {
+    background: #f8fafc;
+    transform: translateY(-3px);
+    border-color: #3b82f6;
+}
+
+.aituButton:active, .activitiesButton:active {
+    transform: scale(0.98);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media screen and (min-width: 600px) {
+    .main {
+        padding-top: 100px; 
+    }
+    
+    .activitiesButton, .aituButton {
+        display: inline-block;
+        width: auto;
+        margin: 10px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .main {
+        padding-bottom: 120px; 
+    }
+}
