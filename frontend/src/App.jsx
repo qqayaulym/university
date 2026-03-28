@@ -1,36 +1,80 @@
-import SignIn from "./pages/SignIn"
-import SignUp from "./pages/SignUp"
-import MainPage from "./pages/MainPage"
-import Courses from "./pages/Courses"
-import StudentProfile from "./pages/StudentProfile"
-import Settings from "./pages/Settings"
-import AdminDashBoard from "./pages/AdminDashboard"
-import CreateDeleteCourse from "./pages/CreateDeleteCourse"
-import CoursesDetails from "./pages/CoursesDetails"
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-import PrivateRoute from "./components/PrivateRoute"
-import MainLayout from "./Layouts/MainLayout"
+const AdminDashBoard = () => {
+  const [users, setUsers] = useState([]);
+  const token = localStorage.getItem("token");
 
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/api/admin/users", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUsers(res.data);
+      } catch (err) {
+        console.error("Қолданушыларды жүктеу қатесі:", err);
+      }
+    };
+    fetchUsers();
+  }, [token]);
 
-const App = () => {
-  return(
-    <BrowserRouter>
-      <Routes>
-        <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/course" element={<Courses />} />
-          <Route path="/myprofile" element={<StudentProfile />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/admin" element={<AdminDashBoard />} />
-          <Route path="/course/:id" element={<CoursesDetails />} />
-        </Route>
-        <Route path="/createcourse" element={<CreateDeleteCourse />} />
-        <Route path="/login" element={<SignIn />} />
-        <Route path="/register" element={<SignUp />} />
-      </Routes>
-    </BrowserRouter>
-  )
-}
+  const handleRoleChange = async (id, role) => {
+    try {
+      const res = await axios.put(
+        `http://localhost:8000/api/admin/users/${id}/role`,
+        { role },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-export default App
+      setUsers(users.map(u => (u.id === id ? res.data : u)));
+    } catch (err) {
+      console.error("Роль өзгерту қатесі:", err);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Әкімші панелі</h2>
+      <h3>Курс құру құқығын беру/алу</h3>
+
+      <table border="1" cellPadding="5">
+        <thead>
+          <tr>
+            <th>Пайдаланушы аты</th>
+            <th>Email</th>
+            <th>Роль</th>
+            <th>Әрекет</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map(user => (
+            <tr key={user.id}>
+              <td>{user.username}</td>
+              <td>{user.email}</td>
+              <td>{user.role}</td>
+              <td>
+                {user.role !== "admin" && (
+                  <>
+                    {user.role !== "creator" && (
+                      <button onClick={() => handleRoleChange(user.id, "creator")}>
+                        Курс құруға рұқсат беру
+                      </button>
+                    )}
+                    {user.role === "creator" && (
+                      <button onClick={() => handleRoleChange(user.id, "user")}>
+                        Құқықты алу
+                      </button>
+                    )}
+                  </>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default AdminDashBoard;

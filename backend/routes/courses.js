@@ -1,13 +1,22 @@
-import { createNewCourse, deleteCourse, showAllCourses, showCourse } from "../controllers/coursesController.js"
+import { 
+  showAllCourses, 
+  createNewCourse, 
+  updateCourse, 
+  deleteCourse, 
+  showCourse 
+} from "../controllers/coursesController.js";import { authMiddleware } from "../middleware/authMiddleware.js"
+import { requireCreator } from "../middleware/roleMiddleware.js"
 import express from "express"
 
 const router = express.Router();
 
 router.get("/", showAllCourses)
 
-router.post("/", createNewCourse);
+router.post("/", authMiddleware, requireCreator, createNewCourse);
 
-router.delete("/:id", deleteCourse);
+router.delete("/:id", authMiddleware, requireCreator, deleteCourse);
+
+router.put("/courses/:id", authMiddleware, requireCreator, updateCourse);
 
 router.get("/:id", showCourse)
 
