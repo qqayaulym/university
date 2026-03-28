@@ -6,9 +6,9 @@ const NavBar = () => {
     const navigate = useNavigate()
 
     const pages = [
+        {name: 'Басты бет', to: '/'},
         {name: 'Менің парақшам', to: '/myprofile'},
-        {name: 'Іс-шаралар', to: '/activities'},
-        {name: 'Менің іс-шараларым', to: '/myactivities'},
+        {name: 'Іс-шаралар', to: '/course'},
         {name: 'Баптаулар', to: '/settings'},
     ]
 

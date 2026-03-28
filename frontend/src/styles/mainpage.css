@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 .main {
     min-height: 100vh;
     display: flex;
@@ -10,12 +8,11 @@
     max-width: 1000px;
     margin: 0 auto;
     text-align: center;
-    font-family: 'Inter', sans-serif;
     animation: fadeIn 0.8s ease-out;
 }
 
 .mainH2 {
-    color: #1e293b;
+    color: #13265c;
     font-size: clamp(24px, 5vw, 42px);
     font-weight: 700;
     line-height: 1.2;
@@ -24,7 +21,7 @@
 }
 
 .mainP {
-    color: #64748b;
+    color: #13265c;
     font-size: clamp(16px, 2vw, 18px);
     line-height: 1.6;
     max-width: 700px;
@@ -35,7 +32,7 @@
     width: 100%;
     max-width: 800px;
     height: clamp(200px, 40vh, 450px);
-    background: #e2e8f0; /* Плейсхолдер, пока нет фото */
+    background: #e2e8f0; 
     border-radius: clamp(20px, 4vw, 40px);
     object-fit: cover;
     margin-bottom: 50px;
@@ -57,7 +54,7 @@
 }
 
 .activitiesButton {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #13265c 0%, #2563eb 100%);
     color: white;
     box-shadow: 0 15px 30px rgba(37, 99, 235, 0.25);
 }
@@ -75,14 +72,14 @@
 
 .aituButton a {
     text-decoration: none;
-    color: #475569;
+    color: #13265c;
     display: block;
 }
 
 .aituButton:hover {
     background: #f8fafc;
     transform: translateY(-3px);
-    border-color: #3b82f6;
+    border-color: #13265c;
 }
 
 .aituButton:active, .activitiesButton:active {

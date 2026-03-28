@@ -28,7 +28,7 @@ export const login = async (req, res) => {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(400).json({ message: "Құпиясөз дұрыс емес!" });
 
-    const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user.id, role: user.role }, SECRET, { expiresIn: "1h" });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: err.message });

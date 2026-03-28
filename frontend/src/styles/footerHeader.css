@@ -1,0 +1,68 @@
+
+.header {
+    width: 100%;
+    /* Адаптивті биіктік пен отступтар */
+    padding: clamp(15px, 3vh, 30px) clamp(20px, 5vw, 60px);
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    /* Десктопта навигацияға орын қалдыру үшін (егер ол сол жақта болса) */
+    padding-left: clamp(20px, 20vw, 280px); 
+}
+
+.headerLogo {
+    font-size: clamp(18px, 2.5vw, 22px);
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.headerLogo span {
+    color: #3b82f6; /* Пастельді көк акцент */
+}
+
+.headerUserAction {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.headerUserInfo {
+    text-align: right;
+    display: none; /* Мобилкада жасыру */
+}
+
+@media (min-width: 768px) {
+    .headerUserInfo {
+        display: block;
+    }
+}
+
+.userName {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.userStatus {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* Мобильді бейімделу */
+@media (max-width: 768px) {
+    .header {
+        padding-left: 20px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(185, 193, 208, 0.1);
+    }
+}
