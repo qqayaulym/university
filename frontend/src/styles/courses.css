@@ -1,0 +1,12 @@
+.coursesListDiv {
+  width: 100%;
+  max-width: 820px;
+}
+
+.coursesSearchInput {
+  margin: 10px 0 14px;
+}
+
+.coursesCard {
+  margin-bottom: 12px;
+}

@@ -1,23 +1,35 @@
 import React, { useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
+import { useToast } from "../components/ToastProvider";
+import Loader from "../components/ui/Loader";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Card from "../components/ui/Card";
+import "../styles/createCourse.css";
 
 const CreateDeleteCourse = () => {
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
     name: "",
-    bio: "",
-    img: "",
-    type: "",
-    who_created: 1,
-    deadline: "",
+    bio: ""
   });
+  const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
 
   const navigate = useNavigate()
 
   const fetchCourses = async () => {
-    const res = await fetch("http://localhost:8000/api/courses");
-    const data = await res.json();
-    setCourses(data);
+    setLoading(true);
+    try {
+      const res = await api.get("/courses");
+      setCourses(Array.isArray(res.data) ? res.data : []);
+    } catch (_err) {
+      setCourses([]);
+      showToast("Курстарды жүктеу мүмкін болмады", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -25,63 +37,57 @@ const CreateDeleteCourse = () => {
   }, []);
 
   const createCourse = async () => {
-    const res = await fetch("http://localhost:8000/api/courses", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    setCourses([...courses, data]);
-    setForm({ name: "", bio: "", img: "", type: "", who_created: 1, deadline: "" });
+    try {
+      const res = await api.post("/courses", form);
+      setCourses([...courses, res.data]);
+      setForm({ name: "", bio: "" });
+      showToast("Курс сәтті қосылды", "success");
+    } catch (err) {
+      showToast(err.response?.data?.message || err.response?.data?.error || "Курс қосу кезінде қате шықты", "error");
+      return;
+    }
   };
 
   const deleteCourse = async (id) => {
-    await fetch(`http://localhost:8000/api/courses/${id}`, { method: "DELETE" });
-    setCourses(courses.filter(course => course.id !== id));
+    try {
+      await api.delete(`/courses/${id}`);
+      setCourses(courses.filter(course => course.id !== id));
+      showToast("Курс өшірілді", "success");
+    } catch (err) {
+      showToast(err.response?.data?.message || "Курсты өшіру кезінде қате шықты", "error");
+      return;
+    }
   };
 
   return (
-    <div>
-      <button onClick={() => navigate("/course")}>Назад</button>
+    <div className="createCoursePage">
+      <Button className="createCourseBackButton" variant="ghost" onClick={() => navigate("/course")}>Назад</Button>
       <h2>Админ: Курсы</h2>
+      {loading && <Loader />}
 
-      <div style={{ marginBottom: "20px" }}>
-        <input
+      <div className="coursesFormSection">
+        <Input
           type="text"
           placeholder="Название курса"
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value })}
         />
-        <input
+        <Input
           type="text"
           placeholder="Описание"
           value={form.bio}
           onChange={e => setForm({ ...form, bio: e.target.value })}
         />
-        <input
-          type="text"
-          placeholder="Тип"
-          value={form.type}
-          onChange={e => setForm({ ...form, type: e.target.value })}
-        />
-        <input
-          type="date"
-          placeholder="Дедлайн"
-          value={form.deadline}
-          onChange={e => setForm({ ...form, deadline: e.target.value })}
-        />
-        <button onClick={createCourse}>Добавить курс</button>
+        <Button onClick={createCourse}>Добавить курс</Button>
       </div>
 
       <div>
         {courses.map(course => (
-          <div key={course.id} style={{ border: "1px solid #ccc", padding: "10px", margin: "10px 0" }}>
+          <Card key={course.id} className="courseCard">
             <h3>{course.name}</h3>
             <p>{course.bio}</p>
-            <p>Тип: {course.type}</p>
-            <p>Дедлайн: {course.deadline}</p>
-            <button onClick={() => deleteCourse(course.id)}>Удалить</button>
-          </div>
+            <Button variant="danger" onClick={() => deleteCourse(course.id)}>Удалить</Button>
+          </Card>
         ))}
       </div>
     </div>

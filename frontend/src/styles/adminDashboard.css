@@ -1,0 +1,35 @@
+.adminDashboard {
+  width: 100%;
+}
+
+.adminDashboardTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  background: #fff;
+}
+
+.adminDashboardTable th,
+.adminDashboardTable td {
+  border: 1px solid #dbe3ee;
+  padding: 10px;
+  text-align: left;
+}
+
+.adminDashboardRoleActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.adminRoleButton {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.adminRoleButton:hover {
+  background: #e2e8f0;
+}

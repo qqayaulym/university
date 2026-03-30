@@ -1,44 +1,51 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
+import { useToast } from "../components/ToastProvider";
+import { getCurrentUserFromToken } from "../utils/auth";
+import Loader from "../components/ui/Loader";
+import Button from "../components/ui/Button";
+import "../styles/adminDashboard.css";
 
 const AdminDashBoard = () => {
   const [users, setUsers] = useState([]);
-  const token = localStorage.getItem("token");
-
+  const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
+  const currentUser = getCurrentUserFromToken();
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoading(true);
       try {
-        const res = await axios.get("http://localhost:8000/api/admin/users", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsers(res.data);
+        const res = await api.get("/admin/users");
+        setUsers(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error(err);
+        showToast("Қолданушыларды жүктеу қатесі", "error");
+      } finally {
+        setLoading(false);
       }
     };
     fetchUsers();
-  }, [token]);
+  }, [showToast]);
 
   const handleRoleChange = async (id, role) => {
     try {
-      const res = await axios.put(
-        `http://localhost:8000/api/admin/users/${id}/role`,
-        { role },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.put(`/admin/users/${id}/role`, { role });
 
-      setUsers(users.map(u => (u.id === id ? res.data : u)));
+      setUsers((prev) => prev.map((u) => (u.id === id ? res.data : u)));
+      showToast("Рөл сәтті жаңартылды", "success");
     } catch (err) {
       console.error(err);
+      showToast(err.response?.data?.message || "Рөлді жаңарту сәтсіз", "error");
     }
   };
 
   return (
-    <div>
+    <div className="adminDashboard">
       <h2>Әкімші панелі</h2>
       <h3>Курс құру құқығын беру/алу</h3>
+      {loading && <Loader />}
 
-      <table border="1">
+      <table className="adminDashboardTable">
         <thead>
           <tr>
             <th>Пайдаланушы аты</th>
@@ -54,19 +61,26 @@ const AdminDashBoard = () => {
               <td>{user.email}</td>
               <td>{user.role}</td>
               <td>
-                {user.role !== "admin" && (
-                  <>
+                {Number(currentUser?.id) === Number(user.id) ? (
+                  <span>Өзіңіз</span>
+                ) : (
+                  <div className="adminDashboardRoleActions">
+                    {user.role !== "user" && (
+                      <Button className="adminRoleButton" variant="secondary" onClick={() => handleRoleChange(user.id, "user")}>
+                        user
+                      </Button>
+                    )}
                     {user.role !== "creator" && (
-                      <button onClick={() => handleRoleChange(user.id, "creator")}>
-                        Курс құруға рұқсат беру
-                      </button>
+                      <Button className="adminRoleButton" variant="secondary" onClick={() => handleRoleChange(user.id, "creator")}>
+                        creator
+                      </Button>
                     )}
-                    {user.role === "creator" && (
-                      <button onClick={() => handleRoleChange(user.id, "user")}>
-                        Құқықты алу
-                      </button>
+                    {user.role !== "admin" && (
+                      <Button className="adminRoleButton" onClick={() => handleRoleChange(user.id, "admin")}>
+                        admin
+                      </Button>
                     )}
-                  </>
+                  </div>
                 )}
               </td>
             </tr>

@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react"
-import axios from "axios"
 import { Link, useNavigate } from "react-router-dom"
 import "../styles/auth.css"
+import api from "../api/axios";
+import { clearAuth, isTokenExpired } from "../utils/auth";
+import { useToast } from "../components/ToastProvider";
+import StatusMessage from "../components/ui/StatusMessage";
 
 const SignUp = () => {
     const navigate = useNavigate()
@@ -11,6 +14,9 @@ const SignUp = () => {
         email: "",
         password: ""
     })
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const { showToast } = useToast();
 
     const handleChange = (e) => {
         setForm({
@@ -21,27 +27,38 @@ const SignUp = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
+        setSuccess("");
 
         try {
-            const res = await axios.post("http://localhost:8000/api/auth/register", form);
+            const res = await api.post("/auth/register", form);
 
             if (res.status === 201) {
-                alert("Сәтті тіркелдіңіз!");
+                setSuccess("Сәтті тіркелдіңіз!");
+                showToast("Аккаунт сәтті құрылды", "success");
                 setForm({ username: "", email: "", password: "" });
             } else {
-                alert("Қате тіркеу!");
+                const msg = "Қате тіркеу!";
+                setError(msg);
+                showToast(msg, "error");
             }
 
         } catch (err) {
             console.log(err.response?.data || err.message);
-            alert(err.response?.data?.message || "Қате тіркеу");
+            const msg = err.response?.data?.message || "Қате тіркеу";
+            setError(msg);
+            showToast(msg, "error");
         }
     }
 
     useEffect(() => {
         const token = localStorage.getItem('token')
         if (token) {
-            navigate("/")
+            if (isTokenExpired()) {
+                clearAuth();
+            } else {
+                navigate("/")
+            }
         }
     }, [navigate])
 
@@ -56,6 +73,8 @@ const SignUp = () => {
             <input className="authInput" value={form.password} name="password" type="password" onChange={handleChange} placeholder="Password" />
             <p className="autConfig">Создавая учетную запись, вы соглашаетесь с нашим <a href="#" className="autConfig">Условия и конфиденциальность</a>.</p>
             <button className="authButton" type="submit">Тіркелу</button>
+            <StatusMessage type="success">{success}</StatusMessage>
+            <StatusMessage type="error">{error}</StatusMessage>
             <p className="authLink">
                 Аккаунтыңыз бар ма? <Link to="/login">Кіру</Link>
             </p>

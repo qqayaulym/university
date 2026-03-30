@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
+import Loader from "../components/ui/Loader";
+import StatusMessage from "../components/ui/StatusMessage";
 
 const CoursesDetails = () => {
   const { id } = useParams();
@@ -12,9 +14,7 @@ const CoursesDetails = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8000/api/courses/${id}`
-        );
+        const res = await api.get(`/courses/${id}`);
 
         console.log("COURSE:", res.data); 
 
@@ -28,8 +28,8 @@ const CoursesDetails = () => {
     fetchCourse();
   }, [id]);
 
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (!course) return <p>Жүктелуде...</p>;
+  if (error) return <StatusMessage type="error">{error}</StatusMessage>;
+  if (!course) return <Loader />;
 
   return (
     <div className="soloCoursesDiv">

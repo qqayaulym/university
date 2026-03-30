@@ -1,0 +1,25 @@
+.settingsPage {
+  width: 100%;
+  max-width: 680px;
+}
+
+.settingsSection {
+  margin-bottom: 20px;
+}
+
+.settingsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settingsForm input {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.settingsForm button {
+  width: fit-content;
+  padding: 8px 12px;
+}

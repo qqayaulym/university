@@ -81,7 +81,7 @@ export const updateCourse = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const result = await pool.query("SELECT user_id FROM courses WHERE id=$1", [id]);
+    const result = await pool.query("SELECT id, user_id, name, bio FROM courses WHERE id=$1", [id]);
     const course = result.rows[0];
 
     if (!course) return res.status(404).json({ message: "Іс-шара табылмады" });

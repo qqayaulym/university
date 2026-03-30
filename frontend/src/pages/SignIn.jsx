@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react"
-import axios from "axios"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import "../styles/auth.css"
+import api from "../api/axios";
+import { clearAuth, isTokenExpired } from "../utils/auth";
+import { useToast } from "../components/ToastProvider";
+import StatusMessage from "../components/ui/StatusMessage";
 
 const SignIn = () => {
     const navigate = useNavigate();
@@ -11,6 +14,9 @@ const SignIn = () => {
         email: "",
         password: ""
     })
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const { showToast } = useToast();
 
     const handleChange = (e) => {
         setform({
@@ -21,26 +27,35 @@ const SignIn = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setError("");
+        setSuccess("");
 
         try{
-            const res = await axios.post(
-                "http://localhost:8000/api/auth/login",
+            const res = await api.post(
+                "/auth/login",
                 form
             )
 
             localStorage.setItem("token", res.data.token);
-            alert("Қайта қош келдіңіз!")
+            setSuccess("Қайта қош келдіңіз!");
+            showToast("Сәтті кірдіңіз", "success");
             setform({ email: "", password: "" })
             navigate("/")
         } catch (err) {
-            alert(err.response?.data?.message || "Қате")
+            const msg = err.response?.data?.message || "Қате";
+            setError(msg)
+            showToast(msg, "error");
         }
     }
 
     useEffect(() => {
         const token = localStorage.getItem('token')
         if (token) {
-            navigate("/")
+            if (isTokenExpired()) {
+                clearAuth();
+            } else {
+                navigate("/")
+            }
         }
     }, [navigate])
 
@@ -68,6 +83,8 @@ const SignIn = () => {
             />
 
             <button type="submit" className="authButton" disabled={!form.email || !form.password}>Sign In</button>
+            <StatusMessage type="success">{success}</StatusMessage>
+            <StatusMessage type="error">{error}</StatusMessage>
             <p className="authLink">
                 Аккаунтыңыз жоқ па? <Link to="/register" className="authLink">Тіркеліңіз</Link>
             </p>

@@ -4,7 +4,8 @@ import {
   updateCourse, 
   deleteCourse, 
   showCourse 
-} from "../controllers/coursesController.js";import { authMiddleware } from "../middleware/authMiddleware.js"
+} from "../controllers/coursesController.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 import { requireCreator } from "../middleware/roleMiddleware.js"
 import express from "express"
 
@@ -16,7 +17,7 @@ router.post("/", authMiddleware, requireCreator, createNewCourse);
 
 router.delete("/:id", authMiddleware, requireCreator, deleteCourse);
 
-router.put("/courses/:id", authMiddleware, requireCreator, updateCourse);
+router.put("/:id", authMiddleware, requireCreator, updateCourse);
 
 router.get("/:id", showCourse)
 

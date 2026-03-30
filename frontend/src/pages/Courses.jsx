@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import axios from "axios"
+import { hasRole } from "../utils/auth";
+import api from "../api/axios";
+import StatusMessage from "../components/ui/StatusMessage";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Card from "../components/ui/Card";
+import "../styles/courses.css";
 
 const Courses = () => {
   const navigate = useNavigate()
@@ -11,7 +17,7 @@ const Courses = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/courses")
+        const res = await api.get("/courses")
         const validCourses = res.data.filter(c => c.name && c.name.trim() !== "")
         setCourses(validCourses)
       } catch (err) {
@@ -34,33 +40,32 @@ const Courses = () => {
     <div className="coursesListDiv">
       <h2>Іс-шаралар</h2>
 
-      <input
-        className="coursesInput"
+      <Input
+        className="coursesSearchInput"
         type="text"
         placeholder="Іздеу..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <StatusMessage type="error">{error}</StatusMessage>
 
       {filteredCourses.length === 0 ? (
         <p>Ештеңе табылмады</p>
       ) : (
         filteredCourses.map(course => (
-          <div key={course.id}>
+          <Card key={course.id} className="coursesCard">
             <h3>{course.name}</h3>
             <p>{course.bio ? course.bio : "Описание отсутствует"}</p>
-            <button
-              className="showDetailsButton"
-              onClick={() => getCourseById(course.id)}
-            >
+            <Button variant="secondary" onClick={() => getCourseById(course.id)}>
               Толығырақ
-            </button>
-          </div>
+            </Button>
+          </Card>
         ))
       )}
-      <button onClick={() => navigate("/createcourse")}>Курс құру</button>
+      {hasRole(["creator", "admin"]) && (
+        <Button onClick={() => navigate("/createcourse")}>Курс құру</Button>
+      )}
     </div>
   )
 }

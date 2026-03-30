@@ -1,0 +1,23 @@
+.createCoursePage {
+  width: 100%;
+}
+
+.createCourseBackButton {
+  margin-bottom: 10px;
+}
+
+.coursesFormSection {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.coursesFormSection input {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.courseCard {
+  margin-top: 10px;
+}

@@ -1,80 +1,57 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { Route, Routes } from "react-router-dom";
+import PrivateRoute from "./components/PrivateRoute";
+import MainLayout from "./Layouts/MainLayout";
+import MainPage from "./pages/MainPage";
+import StudentProfile from "./pages/StudentProfile";
+import Courses from "./pages/Courses";
+import Settings from "./pages/Settings";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+import CoursesDetails from "./pages/CoursesDetails";
+import CreateDeleteCourse from "./pages/CreateDeleteCourse";
+import AdminDashBoard from "./pages/AdminDashboard";
+import NotFound from "./pages/NotFound";
 
-const AdminDashBoard = () => {
-  const [users, setUsers] = useState([]);
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await axios.get("http://localhost:8000/api/admin/users", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsers(res.data);
-      } catch (err) {
-        console.error("Қолданушыларды жүктеу қатесі:", err);
-      }
-    };
-    fetchUsers();
-  }, [token]);
-
-  const handleRoleChange = async (id, role) => {
-    try {
-      const res = await axios.put(
-        `http://localhost:8000/api/admin/users/${id}/role`,
-        { role },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setUsers(users.map(u => (u.id === id ? res.data : u)));
-    } catch (err) {
-      console.error("Роль өзгерту қатесі:", err);
-    }
-  };
-
+const App = () => {
   return (
-    <div>
-      <h2>Әкімші панелі</h2>
-      <h3>Курс құру құқығын беру/алу</h3>
+    <Routes>
+      <Route path="/login" element={<SignIn />} />
+      <Route path="/register" element={<SignUp />} />
 
-      <table border="1" cellPadding="5">
-        <thead>
-          <tr>
-            <th>Пайдаланушы аты</th>
-            <th>Email</th>
-            <th>Роль</th>
-            <th>Әрекет</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => (
-            <tr key={user.id}>
-              <td>{user.username}</td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>
-                {user.role !== "admin" && (
-                  <>
-                    {user.role !== "creator" && (
-                      <button onClick={() => handleRoleChange(user.id, "creator")}>
-                        Курс құруға рұқсат беру
-                      </button>
-                    )}
-                    {user.role === "creator" && (
-                      <button onClick={() => handleRoleChange(user.id, "user")}>
-                        Құқықты алу
-                      </button>
-                    )}
-                  </>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <MainLayout />
+          </PrivateRoute>
+        }
+      >
+        <Route index element={<MainPage />} />
+        <Route path="myprofile" element={<StudentProfile />} />
+        <Route path="course" element={<Courses />} />
+        <Route path="course/:id" element={<CoursesDetails />} />
+        <Route
+          path="createcourse"
+          element={
+            <PrivateRoute roles={["creator", "admin"]}>
+              <CreateDeleteCourse />
+            </PrivateRoute>
+          }
+        />
+        <Route path="settings" element={<Settings />} />
+        <Route
+          path="admin"
+          element={
+            <PrivateRoute roles={["admin"]}>
+              <AdminDashBoard />
+            </PrivateRoute>
+          }
+        />
+      </Route>
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 };
 
-export default AdminDashBoard;
+export default App;

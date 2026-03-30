@@ -1,0 +1,54 @@
+.statusText {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.statusText.success {
+  color: #16a34a;
+}
+
+.statusText.error {
+  color: #dc2626;
+}
+
+.statusText.info {
+  color: #2563eb;
+}
+
+.loaderText {
+  color: #475569;
+  margin: 10px 0;
+}
+
+.centeredPage {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.toastContainer {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+}
+
+.toastItem {
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  min-width: 240px;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.toastItem.info {
+  background-color: #2563eb;
+}
+
+.toastItem.success {
+  background-color: #22c55e;
+}
+
+.toastItem.error {
+  background-color: #ef4444;
+}
