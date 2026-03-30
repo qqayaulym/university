@@ -10,6 +10,7 @@ import SignUp from "./pages/SignUp";
 import CoursesDetails from "./pages/CoursesDetails";
 import CreateDeleteCourse from "./pages/CreateDeleteCourse";
 import AdminDashBoard from "./pages/AdminDashboard";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
 const App = () => {
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="myprofile" element={<StudentProfile />} />
         <Route path="course" element={<Courses />} />
         <Route path="course/:id" element={<CoursesDetails />} />
+        <Route path="notifications" element={<Notifications />} />
         <Route
           path="createcourse"
           element={

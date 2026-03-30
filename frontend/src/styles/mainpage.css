@@ -40,6 +40,35 @@
     border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
+.mainSectionGrid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 10px 0 30px;
+}
+
+.mainCourseCard {
+    text-align: left;
+}
+
+.mainWeekGrid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 10px 0 30px;
+}
+
+.mainWeekDay {
+    text-align: left;
+}
+
+.mainWeekItem {
+    padding: 8px 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.25);
+}
+
 .activitiesButton, .aituButton {
     width: 100%;
     max-width: 320px;

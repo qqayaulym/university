@@ -1,13 +1,14 @@
-
 .header {
     width: 100%;
+
     /* Адаптивті биіктік пен отступтар */
     padding: clamp(15px, 3vh, 30px) clamp(20px, 5vw, 60px);
-    background-color: #ffffff;
+    background-color: var(--card-bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--card-border);
+
     /* Десктопта навигацияға орын қалдыру үшін (егер ол сол жақта болса) */
     padding-left: clamp(20px, 20vw, 280px); 
 }
@@ -15,7 +16,8 @@
 .headerLogo {
     font-size: clamp(18px, 2.5vw, 22px);
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text);
+
     letter-spacing: -0.03em;
     text-decoration: none;
     display: flex;
@@ -48,12 +50,27 @@
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: #334155;
+    color: var(--text);
 }
 
 .userStatus {
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--muted);
+}
+
+.footer {
+    width: 100%;
+    padding: 18px 20px;
+    border-top: 1px solid var(--card-border);
+    background: var(--card-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footerText {
+    color: var(--muted);
+    font-size: 13px;
 }
 
 /* Мобильді бейімделу */

@@ -1,18 +1,34 @@
 import jwt from "jsonwebtoken";
+import { pool } from "../db.js";
 const SECRET = "mysupersecret";
 
 export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  if (!authHeader) return res.status(401).json({ message: "Нет токена" });
+  if (!authHeader) return res.status(401).json({ message: "Токен жоқ" });
 
   const token = authHeader.split(" ")[1]; // Bearer <token>
-  if (!token) return res.status(401).json({ message: "Нет токена" });
+  if (!token) return res.status(401).json({ message: "Токен жоқ" });
 
-  try {
-    const decoded = jwt.verify(token, SECRET);
-    req.user = { id: decoded.id, role: decoded.role }; 
-    next();
-  } catch (err) {
-    res.status(403).json({ message: "Неверный токен" });
-  }
+  (async () => {
+    try {
+      const decoded = jwt.verify(token, SECRET);
+      const userId = Number(decoded.id);
+
+      if (!Number.isFinite(userId)) {
+        return res.status(403).json({ message: "Токен қате" });
+      }
+
+      const result = await pool.query("SELECT role FROM users WHERE id=$1", [userId]);
+      const dbUser = result.rows[0];
+
+      if (!dbUser) {
+        return res.status(401).json({ message: "Пайдаланушы табылмады" });
+      }
+
+      req.user = { id: userId, role: dbUser.role };
+      next();
+    } catch (_err) {
+      res.status(403).json({ message: "Токен қате" });
+    }
+  })();
 };

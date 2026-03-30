@@ -2,8 +2,8 @@ import React from "react"
 
 const Footer = () => {
     return(
-        <footer className="footerDiv">
-            <p className="footerText">Это футер</p>
+        <footer className="footer">
+            <p className="footerText"> {new Date().getFullYear()} AITU Events</p>
         </footer>
     )
 }

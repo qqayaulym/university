@@ -4,19 +4,24 @@
 }
 
 .navBar {
+
     position: fixed;
     top: clamp(10px, 2vh, 25px);
     left: clamp(10px, 2vw, 25px);
     height: calc(100vh - clamp(20px, 4vh, 50px));
     width: clamp(200px, 15vw, 260px);
-    background-color: #ffffff;
+    background-color: var(--surface);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+
     display: flex;
     flex-direction: column;
     padding: clamp(20px, 3vh, 35px) 15px;
     gap: 12px;
     border-radius: clamp(20px, 3vw, 35px);
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 20px 40px rgba(185, 193, 208, 0.25);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow);
+
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 2000;
 }
@@ -26,8 +31,9 @@
 }
 
 .navList {
-    color: #13265c;
+    color: var(--text);
     text-decoration: none;
+
     font-weight: 500;
     font-size: clamp(14px, 1.2vw, 15px);
     padding: 14px 20px;
@@ -38,22 +44,24 @@
 }
 
 .navList:hover {
-    background-color: #f0f7ff;
-    color: #13265c;
+    background-color: rgba(148, 163, 184, 0.16);
+    color: var(--text);
     transform: translateX(4px);
 }
 
 .navList.active {
-    background-color: #3b82f6;
+    background-color: var(--accent);
     color: #ffffff;
 }
 
 .navLogOutButton {
+
     margin-top: auto;
     padding: 16px;
-    background-color: #fff1f2;
-    color: #13265c;
-    border: 1px solid #ffe4e6;
+    background-color: rgba(239, 68, 68, 0.12);
+    color: var(--text);
+    border: 1px solid rgba(239, 68, 68, 0.22);
+
     border-radius: 20px;
     font-weight: 600;
     font-size: clamp(13px, 1.2vw, 15px);
@@ -62,11 +70,12 @@
 }
 
 .navLogOutButton:hover {
-    background-color: #ffe4e6;
+    background-color: rgba(239, 68, 68, 0.18);
     transform: scale(1.02);
 }
 
 .navToggleButton {
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -75,12 +84,13 @@
     right: -55px;
     width: 45px;
     height: 45px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    color: #64748b;
+    background: var(--surface);
+    border: 1px solid var(--card-border);
+    color: var(--muted);
+
     border-radius: 15px;
     cursor: pointer;
-    box-shadow: 0 10px 20px rgba(185, 193, 208, 0.2);
+    box-shadow: var(--shadow-soft);
 }
 
 @media screen and (max-width: 768px) {

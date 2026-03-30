@@ -21,8 +21,8 @@ const Courses = () => {
         const validCourses = res.data.filter(c => c.name && c.name.trim() !== "")
         setCourses(validCourses)
       } catch (err) {
-        console.error("Ошибка при получении курсов:", err)
-        setError("Не удалось загрузить курсы")
+        console.error("Курстарды алу кезінде қате:", err)
+        setError("Курстарды жүктеу мүмкін болмады")
       }
     }
     fetchCourses()
@@ -35,6 +35,21 @@ const Courses = () => {
   const filteredCourses = courses.filter(course =>
     course.name.toLowerCase().includes(search.toLowerCase())
   )
+
+  const formatDateTime = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleString();
+  };
+
+  const hoursToDeadline = (endAt) => {
+    if (!endAt) return null;
+    const end = new Date(endAt);
+    if (Number.isNaN(end.getTime())) return null;
+    const diffMs = end.getTime() - Date.now();
+    return Math.ceil(diffMs / (1000 * 60 * 60));
+  };
 
   return (
     <div className="coursesListDiv">
@@ -56,7 +71,16 @@ const Courses = () => {
         filteredCourses.map(course => (
           <Card key={course.id} className="coursesCard">
             <h3>{course.name}</h3>
-            <p>{course.bio ? course.bio : "Описание отсутствует"}</p>
+            <p>{course.bio ? course.bio : "Сипаттама жоқ"}</p>
+            {course.start_at && <p>Басталу уақыты: {formatDateTime(course.start_at)}</p>}
+            {course.end_at && <p>Аяқталу уақыты: {formatDateTime(course.end_at)}</p>}
+            {course.end_at && (
+              (() => {
+                const h = hoursToDeadline(course.end_at);
+                if (h === null) return null;
+                return <p>Дедлайнға: <b>{h <= 0 ? "аяқталды" : `${h} сағат`}</b></p>;
+              })()
+            )}
             <Button variant="secondary" onClick={() => getCourseById(course.id)}>
               Толығырақ
             </Button>

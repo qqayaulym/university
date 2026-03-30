@@ -31,7 +31,7 @@ export const login = async (req, res) => {
     const token = jwt.sign({ id: user.id, role: user.role }, SECRET, { expiresIn: "1h" });
     res.json({ token });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Сервер қатесі" });
   }
 };
 
@@ -48,7 +48,7 @@ export const getMe = async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Сервер қатесі" });
   }
 };
 
@@ -56,7 +56,7 @@ export const updateMe = async (req, res) => {
   const { username, email } = req.body;
 
   if (!username || !email) {
-    return res.status(400).json({ message: "Username және email міндетті" });
+    return res.status(400).json({ message: "Пайдаланушы аты және email міндетті" });
   }
 
   try {
@@ -74,7 +74,7 @@ export const updateMe = async (req, res) => {
     if (String(err.message).toLowerCase().includes("unique")) {
       return res.status(400).json({ message: "Бұл email бос емес" });
     }
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Сервер қатесі" });
   }
 };
 

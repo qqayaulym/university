@@ -7,22 +7,22 @@
 }
 
 .uiButton-primary {
-  background: #2563eb;
+  background: var(--accent);
   color: #fff;
 }
 
 .uiButton-primary:hover {
-  background: #1d4ed8;
+  background: var(--accent-2);
 }
 
 .uiButton-secondary {
-  background: #f1f5f9;
-  color: #0f172a;
-  border-color: #cbd5e1;
+  background: rgba(148, 163, 184, 0.14);
+  color: var(--text);
+  border-color: var(--card-border);
 }
 
 .uiButton-secondary:hover {
-  background: #e2e8f0;
+  background: rgba(148, 163, 184, 0.22);
 }
 
 .uiButton-danger {
@@ -36,15 +36,17 @@
 
 .uiButton-ghost {
   background: transparent;
-  color: #0f172a;
-  border-color: #cbd5e1;
+  color: var(--text);
+  border-color: var(--card-border);
 }
 
 .uiInput {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--card-border);
   border-radius: 10px;
   padding: 9px 12px;
   min-width: 200px;
+  background: var(--surface);
+  color: var(--text);
 }
 
 .uiInput:focus {
@@ -54,8 +56,11 @@
 }
 
 .uiCard {
-  border: 1px solid #dbe3ee;
+  border: 1px solid var(--card-border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--card-bg);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
   padding: 14px;
+  box-shadow: var(--shadow-soft);
 }

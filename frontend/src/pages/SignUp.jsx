@@ -5,9 +5,12 @@ import api from "../api/axios";
 import { clearAuth, isTokenExpired } from "../utils/auth";
 import { useToast } from "../components/ToastProvider";
 import StatusMessage from "../components/ui/StatusMessage";
+import { useI18n } from "../contexts/I18nContext";
 
 const SignUp = () => {
     const navigate = useNavigate()
+
+    const { t } = useI18n();
 
     const [form, setForm] = useState({
         username: "",
@@ -44,7 +47,6 @@ const SignUp = () => {
             }
 
         } catch (err) {
-            console.log(err.response?.data || err.message);
             const msg = err.response?.data?.message || "Қате тіркеу";
             setError(msg);
             showToast(msg, "error");
@@ -64,14 +66,14 @@ const SignUp = () => {
 
     return (
         <form onSubmit={handleSubmit} className="authForm">
-            <h2 className="authTitle">Тіркелу</h2>
-            <label htmlFor="username" className="formLabel">Юзернейм:</label>
-            <input className="authInput" value={form.username} name="username" onChange={handleChange} placeholder="Username" />
+            <h2 className="authTitle">{t("auth_signup_title")}</h2>
+            <label htmlFor="username" className="formLabel">Пайдаланушы аты:</label>
+            <input className="authInput" value={form.username} name="username" onChange={handleChange} placeholder="Пайдаланушы аты" />
             <label htmlFor="email" className="formLabel">Email:</label>
             <input className="authInput" value={form.email} name="email" onChange={handleChange} placeholder="Email" />
             <label htmlFor="password" className="formLabel">Құпиясөз:</label>
-            <input className="authInput" value={form.password} name="password" type="password" onChange={handleChange} placeholder="Password" />
-            <p className="autConfig">Создавая учетную запись, вы соглашаетесь с нашим <a href="#" className="autConfig">Условия и конфиденциальность</a>.</p>
+            <input className="authInput" value={form.password} name="password" type="password" onChange={handleChange} placeholder="Құпиясөз" />
+            <p className="autConfig">Тіркелу арқылы сіз біздің <a href="#" className="autConfig">Шарттар және құпиялылық</a> ережелерімізбен келісесіз.</p>
             <button className="authButton" type="submit">Тіркелу</button>
             <StatusMessage type="success">{success}</StatusMessage>
             <StatusMessage type="error">{error}</StatusMessage>

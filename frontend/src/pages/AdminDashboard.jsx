@@ -11,6 +11,14 @@ const AdminDashBoard = () => {
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
   const currentUser = getCurrentUserFromToken();
+
+  const roleLabel = (role) => {
+    if (role === "admin") return "әкімші";
+    if (role === "creator") return "крейтор";
+    if (role === "user") return "пайдаланушы";
+    return role;
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -50,34 +58,46 @@ const AdminDashBoard = () => {
           <tr>
             <th>Пайдаланушы аты</th>
             <th>Email</th>
-            <th>Роль</th>
+            <th>Рөлі</th>
             <th>Әрекет</th>
           </tr>
         </thead>
+
         <tbody>
-          {users.map(user => (
+          {users.map((user) => (
             <tr key={user.id}>
               <td>{user.username}</td>
               <td>{user.email}</td>
-              <td>{user.role}</td>
+              <td>{roleLabel(user.role)}</td>
               <td>
                 {Number(currentUser?.id) === Number(user.id) ? (
                   <span>Өзіңіз</span>
                 ) : (
                   <div className="adminDashboardRoleActions">
                     {user.role !== "user" && (
-                      <Button className="adminRoleButton" variant="secondary" onClick={() => handleRoleChange(user.id, "user")}>
-                        user
+                      <Button
+                        className="adminRoleButton"
+                        variant="secondary"
+                        onClick={() => handleRoleChange(user.id, "user")}
+                      >
+                        пайдаланушы
                       </Button>
                     )}
                     {user.role !== "creator" && (
-                      <Button className="adminRoleButton" variant="secondary" onClick={() => handleRoleChange(user.id, "creator")}>
-                        creator
+                      <Button
+                        className="adminRoleButton"
+                        variant="secondary"
+                        onClick={() => handleRoleChange(user.id, "creator")}
+                      >
+                        крейтор
                       </Button>
                     )}
                     {user.role !== "admin" && (
-                      <Button className="adminRoleButton" onClick={() => handleRoleChange(user.id, "admin")}>
-                        admin
+                      <Button
+                        className="adminRoleButton"
+                        onClick={() => handleRoleChange(user.id, "admin")}
+                      >
+                        әкімші
                       </Button>
                     )}
                   </div>

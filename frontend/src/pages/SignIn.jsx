@@ -6,9 +6,12 @@ import api from "../api/axios";
 import { clearAuth, isTokenExpired } from "../utils/auth";
 import { useToast } from "../components/ToastProvider";
 import StatusMessage from "../components/ui/StatusMessage";
+import { useI18n } from "../contexts/I18nContext";
 
 const SignIn = () => {
     const navigate = useNavigate();
+
+    const { t } = useI18n();
 
     const [form, setform] = useState({
         email: "",
@@ -61,7 +64,7 @@ const SignIn = () => {
 
     return(
         <form onSubmit={handleSubmit} className="authForm">
-            <h2 className="authTitle">Логин</h2>
+            <h2 className="authTitle">{t("auth_login_title")}</h2>
 
             <label htmlFor="email" className="formLabel">Email:</label>
             <input
@@ -77,12 +80,12 @@ const SignIn = () => {
                 name="password"
                 value={form.password}
                 type="password"
-                placeholder="Password"
+                placeholder={t("auth_password_placeholder")}
                 onChange={handleChange}
                 className="authInput"
             />
 
-            <button type="submit" className="authButton" disabled={!form.email || !form.password}>Sign In</button>
+            <button type="submit" className="authButton" disabled={!form.email || !form.password}>{t("auth_login_button")}</button>
             <StatusMessage type="success">{success}</StatusMessage>
             <StatusMessage type="error">{error}</StatusMessage>
             <p className="authLink">
