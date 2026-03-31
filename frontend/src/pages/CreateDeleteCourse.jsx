@@ -6,25 +6,26 @@ import Loader from "../components/ui/Loader";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Card from "../components/ui/Card";
+import { useI18n } from "../contexts/I18nContext";
 import "../styles/createCourse.css";
 
 const CreateDeleteCourse = () => {
   const [courses, setCourses] = useState([]);
   const [applicationsByCourseId, setApplicationsByCourseId] = useState({});
+  const [openApplications, setOpenApplications] = useState({});
   const [form, setForm] = useState({
     name: "",
-    bio: "",
-    startAt: "",
-    endAt: ""
+    bio: ""
   });
 
   const [creating, setCreating] = useState(false);
   const [editingCourseId, setEditingCourseId] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", bio: "", startAt: "", endAt: "" });
+  const [editForm, setEditForm] = useState({ name: "", bio: "" });
 
   const [savingEdit, setSavingEdit] = useState(false);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
+  const { t } = useI18n();
 
   const statusLabel = (s) => {
     if (s === "pending") return "Қаралуда";
@@ -55,9 +56,22 @@ const CreateDeleteCourse = () => {
         ...prev,
         [courseId]: Array.isArray(res.data) ? res.data : []
       }));
+      setOpenApplications((prev) => ({ ...prev, [courseId]: true }));
     } catch (_err) {
       setApplicationsByCourseId((prev) => ({ ...prev, [courseId]: [] }));
     }
+  };
+
+  const toggleApplications = async (courseId) => {
+    if (!openApplications[courseId] && !applicationsByCourseId[courseId]) {
+      await fetchApplications(courseId);
+      return;
+    }
+
+    setOpenApplications((prev) => ({
+      ...prev,
+      [courseId]: !prev[courseId]
+    }));
   };
 
   const updateApplication = async (applicationId, status, courseId) => {
@@ -73,8 +87,6 @@ const CreateDeleteCourse = () => {
   const createCourse = async () => {
     const name = String(form.name || "").trim();
     const bio = String(form.bio || "").trim();
-    const startAt = String(form.startAt || "").trim();
-    const endAt = String(form.endAt || "").trim();
 
     if (!name) {
       showToast("Курс атауын енгізіңіз", "error");
@@ -86,15 +98,10 @@ const CreateDeleteCourse = () => {
       return;
     }
 
-    if (!startAt) {
-      showToast("Басталу уақытын енгізіңіз", "error");
-      return;
-    }
-
     setCreating(true);
     try {
-      const res = await api.post("/courses", { name, bio, startAt, endAt: endAt || null });
-      setForm({ name: "", bio: "", startAt: "", endAt: "" });
+      const res = await api.post("/courses", { name, bio });
+      setForm({ name: "", bio: "" });
       showToast("Курс сәтті қосылды", "success");
       fetchCourses();
     } catch (err) {
@@ -108,22 +115,18 @@ const CreateDeleteCourse = () => {
     setEditingCourseId(course.id);
     setEditForm({
       name: String(course.name || ""),
-      bio: String(course.bio || ""),
-      startAt: course.start_at ? String(course.start_at).slice(0, 16) : "",
-      endAt: course.end_at ? String(course.end_at).slice(0, 16) : "",
+      bio: String(course.bio || "")
     });
   };
 
   const cancelEdit = () => {
     setEditingCourseId(null);
-    setEditForm({ name: "", bio: "", startAt: "", endAt: "" });
+    setEditForm({ name: "", bio: "" });
   };
 
   const saveEdit = async (courseId) => {
     const name = String(editForm.name || "").trim();
     const bio = String(editForm.bio || "").trim();
-    const startAt = String(editForm.startAt || "").trim();
-    const endAt = String(editForm.endAt || "").trim();
 
     if (!name) {
       showToast("Курс атауын енгізіңіз", "error");
@@ -136,7 +139,7 @@ const CreateDeleteCourse = () => {
 
     setSavingEdit(true);
     try {
-      const res = await api.put(`/courses/${courseId}`, { name, bio, startAt, endAt: endAt || null });
+      const res = await api.put(`/courses/${courseId}`, { name, bio });
       setCourses((prev) => prev.map((c) => (c.id === courseId ? res.data : c)));
       showToast("Курс жаңартылды", "success");
       cancelEdit();
@@ -166,37 +169,25 @@ const CreateDeleteCourse = () => {
 
   return (
     <div className="createCoursePage">
-      <Button className="createCourseBackButton" variant="ghost" onClick={() => navigate("/course")}>Артқа</Button>
-      <h2>Курс басқару</h2>
+      <Button className="createCourseBackButton" variant="ghost" onClick={() => navigate("/course")}>{t("course_back")}</Button>
+      <h2>{t("creator_manage_title")}</h2>
       {loading && <Loader />}
 
       <div className="coursesFormSection">
         <Input
           type="text"
-          placeholder="Курс атауы"
+          placeholder={t("creator_course_name")}
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value })}
         />
         <Input
           type="text"
-          placeholder="Сипаттама"
+          placeholder={t("creator_course_bio")}
           value={form.bio}
           onChange={e => setForm({ ...form, bio: e.target.value })}
         />
-        <Input
-          type="datetime-local"
-          placeholder="Басталу уақыты"
-          value={form.startAt}
-          onChange={e => setForm({ ...form, startAt: e.target.value })}
-        />
-        <Input
-          type="datetime-local"
-          placeholder="Аяқталу уақыты (міндетті емес)"
-          value={form.endAt}
-          onChange={e => setForm({ ...form, endAt: e.target.value })}
-        />
-        <Button onClick={createCourse} disabled={creating || !String(form.name || "").trim() || !String(form.bio || "").trim() || !String(form.startAt || "").trim()}>
-          {creating ? "Қосылуда..." : "Курс қосу"}
+        <Button onClick={createCourse} disabled={creating || !String(form.name || "").trim() || !String(form.bio || "").trim()}>
+          {creating ? t("creator_adding_course") : t("creator_add_course")}
         </Button>
       </div>
 
@@ -207,35 +198,23 @@ const CreateDeleteCourse = () => {
               <div>
                 <Input
                   type="text"
-                  placeholder="Курс атауы"
+                  placeholder={t("creator_course_name")}
                   value={editForm.name}
                   onChange={(e) => setEditForm((p) => ({ ...p, name: e.target.value }))}
                 />
                 <Input
                   type="text"
-                  placeholder="Сипаттама"
+                  placeholder={t("creator_course_bio")}
                   value={editForm.bio}
                   onChange={(e) => setEditForm((p) => ({ ...p, bio: e.target.value }))}
-                />
-                <Input
-                  type="datetime-local"
-                  placeholder="Басталу уақыты"
-                  value={editForm.startAt}
-                  onChange={(e) => setEditForm((p) => ({ ...p, startAt: e.target.value }))}
-                />
-                <Input
-                  type="datetime-local"
-                  placeholder="Аяқталу уақыты (міндетті емес)"
-                  value={editForm.endAt}
-                  onChange={(e) => setEditForm((p) => ({ ...p, endAt: e.target.value }))}
                 />
 
                 <div className="coursesFormSection">
                   <Button onClick={() => saveEdit(course.id)} disabled={savingEdit}>
-                    {savingEdit ? "Сақталуда..." : "Сақтау"}
+                    {savingEdit ? t("creator_saving") : t("creator_save")}
                   </Button>
                   <Button variant="secondary" onClick={cancelEdit} disabled={savingEdit}>
-                    Болдырмау
+                    {t("creator_cancel")}
                   </Button>
                 </div>
               </div>
@@ -248,13 +227,15 @@ const CreateDeleteCourse = () => {
 
             {editingCourseId !== course.id && (
               <Button variant="secondary" onClick={() => startEdit(course)}>
-                Өңдеу
+                {t("creator_edit")}
               </Button>
             )}
 
-            <Button variant="secondary" onClick={() => fetchApplications(course.id)}>Өтінімдер</Button>
+            <Button variant="secondary" onClick={() => toggleApplications(course.id)}>
+              {openApplications[course.id] ? t("creator_hide_applications") : t("creator_applications")}
+            </Button>
 
-            {Array.isArray(applicationsByCourseId[course.id]) && applicationsByCourseId[course.id].length > 0 && (
+            {openApplications[course.id] && Array.isArray(applicationsByCourseId[course.id]) && applicationsByCourseId[course.id].length > 0 && (
               <div>
                 {applicationsByCourseId[course.id].map((a) => (
                   <Card key={a.id} className="courseCard">
@@ -262,15 +243,15 @@ const CreateDeleteCourse = () => {
                     <p>Статус: <b>{statusLabel(a.status)}</b></p>
                     {a.status === "pending" && (
                       <div>
-                        <Button onClick={() => updateApplication(a.id, "accepted", course.id)}>Қабылдау</Button>
-                        <Button variant="danger" onClick={() => updateApplication(a.id, "rejected", course.id)}>Қабылдамау</Button>
+                        <Button onClick={() => updateApplication(a.id, "accepted", course.id)}>{t("creator_accept")}</Button>
+                        <Button variant="danger" onClick={() => updateApplication(a.id, "rejected", course.id)}>{t("creator_reject")}</Button>
                       </div>
                     )}
                   </Card>
                 ))}
               </div>
             )}
-            <Button variant="danger" onClick={() => deleteCourse(course.id)}>Өшіру</Button>
+            <Button variant="danger" onClick={() => deleteCourse(course.id)}>{t("creator_delete")}</Button>
           </Card>
         ))}
       </div>

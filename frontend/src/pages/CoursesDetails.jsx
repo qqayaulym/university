@@ -5,12 +5,14 @@ import Loader from "../components/ui/Loader";
 import StatusMessage from "../components/ui/StatusMessage";
 import Button from "../components/ui/Button";
 import { useToast } from "../components/ToastProvider";
+import { useI18n } from "../contexts/I18nContext";
 
 const CoursesDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const { showToast } = useToast();
+  const { t } = useI18n();
 
   const [course, setCourse] = useState(null);
   const [error, setError] = useState("");
@@ -22,14 +24,6 @@ const CoursesDetails = () => {
     if (s === "accepted") return "Қабылданды";
     if (s === "rejected") return "Қабылданбады";
     return s;
-  };
-
-  const hoursToDeadline = (endAt) => {
-    if (!endAt) return null;
-    const end = new Date(endAt);
-    if (Number.isNaN(end.getTime())) return null;
-    const diffMs = end.getTime() - Date.now();
-    return Math.ceil(diffMs / (1000 * 60 * 60));
   };
 
   const formatDateTime = (iso) => {
@@ -81,44 +75,31 @@ const CoursesDetails = () => {
   if (error) return <StatusMessage type="error">{error}</StatusMessage>;
   if (!course) return <Loader />;
 
+  const isAccepted = myApplication?.status === "accepted";
+
   return (
     <div className="soloCoursesDiv">
-      <button onClick={() => navigate(-1)}>← Артқа</button>
+      <Button variant="ghost" onClick={() => navigate(-1)}>{t("course_back")}</Button>
 
       <h2>{course.name}</h2>
       <p>{course.bio}</p>
 
       {course.start_at && (
         <p>
-          Басталуы: <b>{formatDateTime(course.start_at)}</b>
+          {t("courses_start")}: <b>{formatDateTime(course.start_at)}</b>
         </p>
-      )}
-      {course.end_at && (
-        <p>
-          Аяқталуы: <b>{formatDateTime(course.end_at)}</b>
-        </p>
-      )}
-
-      {course.end_at && (
-        (() => {
-          const h = hoursToDeadline(course.end_at);
-          if (h === null) return null;
-          return (
-            <p>
-              Дедлайнға: <b>{h <= 0 ? "аяқталды" : `${h} сағат`}</b>
-            </p>
-          );
-        })()
       )}
 
       {myApplication?.status && (
         <p>
-          Өтінім статусы: <b>{statusLabel(myApplication.status)}</b>
+          {t("course_application_status")}: <b>{statusLabel(myApplication.status)}</b>
         </p>
       )}
 
-      <Button onClick={apply} disabled={applying || myApplication?.status === "pending"}>
-        Өтінім жіберу
+      {isAccepted && <p>{t("course_already_member")}</p>}
+
+      <Button onClick={apply} disabled={applying || myApplication?.status === "pending" || isAccepted}>
+        {t("course_apply")}
       </Button>
     </div>
   );

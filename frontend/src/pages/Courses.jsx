@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { PlusCircle, Search, X, ArrowRight } from "lucide-react"
 import { hasRole } from "../utils/auth";
 import api from "../api/axios";
 import StatusMessage from "../components/ui/StatusMessage";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Card from "../components/ui/Card";
+import { useI18n } from "../contexts/I18nContext";
 import "../styles/courses.css";
 
 const Courses = () => {
   const navigate = useNavigate()
+  const { t } = useI18n();
   const [courses, setCourses] = useState([])
   const [search, setSearch] = useState("")
   const [error, setError] = useState("")
@@ -43,52 +46,56 @@ const Courses = () => {
     return d.toLocaleString();
   };
 
-  const hoursToDeadline = (endAt) => {
-    if (!endAt) return null;
-    const end = new Date(endAt);
-    if (Number.isNaN(end.getTime())) return null;
-    const diffMs = end.getTime() - Date.now();
-    return Math.ceil(diffMs / (1000 * 60 * 60));
-  };
+  const clearSearch = () => setSearch("")
 
   return (
     <div className="coursesListDiv">
-      <h2>Іс-шаралар</h2>
+      <div className="coursesHero">
+        <div>
+          <h2>{t("courses_title")}</h2>
+          <p className="coursesLead">{filteredCourses.length > 0 ? `${filteredCourses.length}` : t("courses_empty")}</p>
+        </div>
 
-      <Input
-        className="coursesSearchInput"
-        type="text"
-        placeholder="Іздеу..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+        {hasRole(["creator", "admin"]) && (
+          <Button icon={PlusCircle} onClick={() => navigate("/createcourse")}>{t("courses_create")}</Button>
+        )}
+      </div>
+
+      <div className="coursesToolbar">
+        <Input
+          className="coursesSearchInput"
+          type="text"
+          placeholder={t("courses_search")}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          icon={Search}
+        />
+        <Button variant="secondary" icon={X} onClick={clearSearch}>{t("courses_clear")}</Button>
+      </div>
 
       <StatusMessage type="error">{error}</StatusMessage>
 
       {filteredCourses.length === 0 ? (
-        <p>Ештеңе табылмады</p>
+        <div className="emptyState coursesEmptyState">
+          <p>{t("courses_empty")}</p>
+        </div>
       ) : (
-        filteredCourses.map(course => (
-          <Card key={course.id} className="coursesCard">
-            <h3>{course.name}</h3>
-            <p>{course.bio ? course.bio : "Сипаттама жоқ"}</p>
-            {course.start_at && <p>Басталу уақыты: {formatDateTime(course.start_at)}</p>}
-            {course.end_at && <p>Аяқталу уақыты: {formatDateTime(course.end_at)}</p>}
-            {course.end_at && (
-              (() => {
-                const h = hoursToDeadline(course.end_at);
-                if (h === null) return null;
-                return <p>Дедлайнға: <b>{h <= 0 ? "аяқталды" : `${h} сағат`}</b></p>;
-              })()
-            )}
-            <Button variant="secondary" onClick={() => getCourseById(course.id)}>
-              Толығырақ
-            </Button>
-          </Card>
-        ))
-      )}
-      {hasRole(["creator", "admin"]) && (
-        <Button onClick={() => navigate("/createcourse")}>Курс құру</Button>
+        <div className="coursesGrid">
+          {filteredCourses.map(course => (
+            <Card key={course.id} className="coursesCard courseCard">
+              <div className="coursesCardBody">
+                <h3>{course.name}</h3>
+                <p>{course.bio ? course.bio : t("courses_no_description")}</p>
+              </div>
+              <div className="coursesCardFooter">
+                {course.start_at ? <p>{t("courses_start")}: {formatDateTime(course.start_at)}</p> : <span />}
+                <Button variant="secondary" icon={ArrowRight} onClick={() => getCourseById(course.id)}>
+                  {t("courses_details")}
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   )

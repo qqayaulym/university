@@ -2,7 +2,7 @@ import { pool } from "../db.js";
 
 export const showAllCourses = async (req, res) => {
     try {
-        const result = await pool.query("SELECT id, name, bio, start_at, end_at FROM courses ORDER BY id DESC")
+        const result = await pool.query("SELECT id, name, bio, start_at FROM courses ORDER BY id DESC")
         res.json(result.rows)
     } catch (err) {
         console.error(err)
@@ -16,7 +16,7 @@ export const getUpcomingCourses = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, name, bio, start_at, end_at
+      `SELECT id, name, bio, start_at
        FROM courses
        WHERE start_at IS NOT NULL AND start_at >= NOW()
        ORDER BY start_at ASC
@@ -46,7 +46,7 @@ export const getWeekCourses = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, name, bio, start_at, end_at
+      `SELECT id, name, bio, start_at
        FROM courses
        WHERE start_at IS NOT NULL
          AND start_at >= $1
@@ -64,7 +64,7 @@ export const getWeekCourses = async (req, res) => {
 export const getMyCreatedCourses = async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, name, bio, start_at, end_at FROM courses WHERE user_id=$1 ORDER BY id DESC",
+      "SELECT id, name, bio, start_at FROM courses WHERE user_id=$1 ORDER BY id DESC",
       [req.user.id]
     );
     res.json(result.rows);
@@ -77,7 +77,7 @@ export const getMyCreatedCourses = async (req, res) => {
 export const getMyMemberCourses = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT c.id, c.name, c.bio, c.start_at, c.end_at
+      `SELECT c.id, c.name, c.bio, c.start_at
        FROM course_members m
        JOIN courses c ON c.id = m.course_id
        WHERE m.user_id=$1
@@ -104,8 +104,8 @@ export const createNewCourse = async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO courses (name, bio) VALUES ($1, $2) RETURNING *",
-      [name.trim(), bio.trim()]
+      "INSERT INTO courses (name, bio, user_id) VALUES ($1, $2, $3) RETURNING id, name, bio, start_at, user_id",
+      [name.trim(), bio.trim(), req.user.id]
     );
     res.status(201).json({ message: "Курс құрылды", course: result.rows[0] });
   } catch (err) {
@@ -141,7 +141,7 @@ export const showCourse = async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT id, name, bio, start_at, end_at FROM courses WHERE id = $1",
+      "SELECT id, name, bio, start_at FROM courses WHERE id = $1",
       [id]
     );
 
@@ -158,11 +158,11 @@ export const showCourse = async (req, res) => {
 
 export const updateCourse = async (req, res) => {
   const { id } = req.params;
-  const { name, bio, startAt, endAt } = req.body;
+  const { name, bio, startAt } = req.body;
   const userId = req.user.id;
 
   try {
-    const result = await pool.query("SELECT id, user_id, name, bio, start_at, end_at FROM courses WHERE id=$1", [id]);
+    const result = await pool.query("SELECT id, user_id, name, bio, start_at FROM courses WHERE id=$1", [id]);
     const course = result.rows[0];
 
     if (!course) return res.status(404).json({ message: "Іс-шара табылмады" });
@@ -172,12 +172,11 @@ export const updateCourse = async (req, res) => {
     }
 
     const updated = await pool.query(
-      "UPDATE courses SET name=$1, bio=$2, start_at=$3, end_at=$4 WHERE id=$5 RETURNING *",
+      "UPDATE courses SET name=$1, bio=$2, start_at=$3 WHERE id=$4 RETURNING id, name, bio, start_at, user_id",
       [
         (name || course.name),
         (bio || course.bio),
         startAt ? new Date(startAt).toISOString() : course.start_at,
-        endAt ? new Date(endAt).toISOString() : course.end_at,
         id
       ]
     );

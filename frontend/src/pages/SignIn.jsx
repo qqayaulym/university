@@ -1,28 +1,25 @@
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { HiOutlineEye, HiOutlineEyeSlash, HiOutlineLockClosed, HiOutlineEnvelope } from "react-icons/hi2"
 import "../styles/auth.css"
 import api from "../api/axios";
 import { clearAuth, isTokenExpired } from "../utils/auth";
 import { useToast } from "../components/ToastProvider";
-import StatusMessage from "../components/ui/StatusMessage";
 import { useI18n } from "../contexts/I18nContext";
 
 const SignIn = () => {
     const navigate = useNavigate();
-
     const { t } = useI18n();
 
-    const [form, setform] = useState({
+    const [form, setForm] = useState({
         email: "",
         password: ""
     })
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+    const [showPassword, setShowPassword] = useState(false)
     const { showToast } = useToast();
 
     const handleChange = (e) => {
-        setform({
+        setForm({
             ...form,
             [e.target.name]: e.target.value
         })
@@ -30,23 +27,15 @@ const SignIn = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        setError("");
-        setSuccess("");
 
-        try{
-            const res = await api.post(
-                "/auth/login",
-                form
-            )
-
+        try {
+            const res = await api.post("/auth/login", form);
             localStorage.setItem("token", res.data.token);
-            setSuccess("Қайта қош келдіңіз!");
             showToast("Сәтті кірдіңіз", "success");
-            setform({ email: "", password: "" })
-            navigate("/")
+            setForm({ email: "", password: "" });
+            navigate("/");
         } catch (err) {
             const msg = err.response?.data?.message || "Қате";
-            setError(msg)
             showToast(msg, "error");
         }
     }
@@ -62,36 +51,67 @@ const SignIn = () => {
         }
     }, [navigate])
 
-    return(
-        <form onSubmit={handleSubmit} className="authForm">
-            <h2 className="authTitle">{t("auth_login_title")}</h2>
+    return (
+        <div className="authPageShell">
+            <div className="authBackdropOrb authBackdropOrb-left" />
+            <div className="authBackdropOrb authBackdropOrb-right" />
 
-            <label htmlFor="email" className="formLabel">Email:</label>
-            <input
-                name="email"
-                value={form.email}
-                placeholder="Email"
-                onChange={handleChange}
-                className="authInput"
-            />
+            <form onSubmit={handleSubmit} className="authForm authForm-rich">
+                <div className="authTop">
+                    <div className="authPill">AITU Events</div>
+                    <h2 className="authTitle">{t("auth_login_title")}</h2>
+                    <p className="authSubtitle">{t("auth_login_subtitle")}</p>
+                </div>
 
-            <label htmlFor="password" className="formLabel">Құпиясөз:</label>
-            <input
-                name="password"
-                value={form.password}
-                type="password"
-                placeholder={t("auth_password_placeholder")}
-                onChange={handleChange}
-                className="authInput"
-            />
+                <div className="authFieldBlock">
+                    <label className="formLabel">{t("auth_email_label")}</label>
+                    <div className="authInputWrap">
+                        <span className="authInputIcon"><HiOutlineEnvelope /></span>
+                        <input
+                            name="email"
+                            value={form.email}
+                            placeholder={t("auth_email_label")}
+                            onChange={handleChange}
+                            className="authInput authInputWithIcon"
+                        />
+                    </div>
+                </div>
 
-            <button type="submit" className="authButton" disabled={!form.email || !form.password}>{t("auth_login_button")}</button>
-            <StatusMessage type="success">{success}</StatusMessage>
-            <StatusMessage type="error">{error}</StatusMessage>
-            <p className="authLink">
-                Аккаунтыңыз жоқ па? <Link to="/register" className="authLink">Тіркеліңіз</Link>
-            </p>
-    </form>
+                <div className="authFieldBlock">
+                    <label className="formLabel">{t("auth_password_label")}</label>
+                    <div className="authInputWrap">
+                        <span className="authInputIcon"><HiOutlineLockClosed /></span>
+                        <input
+                            name="password"
+                            value={form.password}
+                            type={showPassword ? "text" : "password"}
+                            placeholder={t("auth_password_placeholder")}
+                            onChange={handleChange}
+                            className="authInput authInputWithIcon authInputWithAction"
+                        />
+                        <button
+                            type="button"
+                            className="authVisibilityButton"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={showPassword ? t("auth_hide_password") : t("auth_show_password")}
+                            title={showPassword ? t("auth_hide_password") : t("auth_show_password")}
+                        >
+                            {showPassword ? <HiOutlineEyeSlash /> : <HiOutlineEye />}
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" className="authButton" disabled={!form.email || !form.password}>
+                    {t("auth_login_button")}
+                </button>
+
+                <div className="authBottomRow">
+                    <p className="authLink">
+                        {t("auth_no_account")} <Link to="/register">{t("auth_go_signup")}</Link>
+                    </p>
+                </div>
+            </form>
+        </div>
     )
 }
 

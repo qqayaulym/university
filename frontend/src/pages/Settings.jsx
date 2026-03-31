@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react"
+import { HiOutlineEye, HiOutlineEyeSlash } from "react-icons/hi2"
 import api from "../api/axios";
-import StatusMessage from "../components/ui/StatusMessage";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
+import StatusMessage from "../components/ui/StatusMessage";
 import { useI18n } from "../contexts/I18nContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { useToast } from "../components/ToastProvider";
 import "../styles/settings.css";
 
 const Settings = () => {
     const { lang, setLang, t } = useI18n();
     const { theme, setTheme } = useTheme();
+    const { showToast } = useToast();
 
     const [profileForm, setProfileForm] = useState({
         username: "",
@@ -19,11 +22,15 @@ const Settings = () => {
         currentPassword: "",
         newPassword: ""
     });
-    const [message, setMessage] = useState("");
+    const [showPasswords, setShowPasswords] = useState({
+        current: false,
+        new: false
+    });
     const [error, setError] = useState("");
 
     useEffect(() => {
         const fetchProfile = async () => {
+
             try {
                 const res = await api.get("/auth/me");
                 setProfileForm({
@@ -34,34 +41,35 @@ const Settings = () => {
                 setError(err.response?.data?.message || "Парақша жүктелмеді");
             }
         };
-
         fetchProfile();
     }, []);
 
     const handleProfileSubmit = async (e) => {
         e.preventDefault();
-        setMessage("");
         setError("");
 
         try {
             await api.put("/auth/me", profileForm);
-            setMessage("Парақша сәтті жаңартылды");
+            showToast("Парақша сәтті жаңартылды", "success");
         } catch (err) {
-            setError(err.response?.data?.message || "Парақшаны жаңарту мүмкін болмады");
+            const msg = err.response?.data?.message || "Парақшаны жаңарту мүмкін болмады";
+            setError(msg);
+            showToast(msg, "error");
         }
     };
 
     const handlePasswordSubmit = async (e) => {
         e.preventDefault();
-        setMessage("");
         setError("");
 
         try {
             const res = await api.put("/auth/change-password", passwordForm);
-            setMessage(res.data?.message || "Құпиясөз сәтті жаңартылды");
+            showToast(res.data?.message || "Құпиясөз сәтті жаңартылды", "success");
             setPasswordForm({ currentPassword: "", newPassword: "" });
         } catch (err) {
-            setError(err.response?.data?.message || "Құпиясөз жаңартылмады");
+            const msg = err.response?.data?.message || "Құпиясөз жаңартылмады";
+            setError(msg);
+            showToast(msg, "error");
         }
     };
 
@@ -94,43 +102,70 @@ const Settings = () => {
                 </select>
             </div>
 
-            <div className="settingsSection">
-                <h3>Қолданушы парақшасы</h3>
+            <div className="settingsSection settingsSectionStack">
+                <h3>{t("settings_profile_section")}</h3>
                 <form className="settingsForm" onSubmit={handleProfileSubmit}>
                     <Input
                         type="text"
-                        placeholder="Пайдаланушы аты"
+                        placeholder={t("settings_username")}
                         value={profileForm.username}
                         onChange={(e) => setProfileForm({ ...profileForm, username: e.target.value })}
                     />
                     <Input
                         type="email"
-                        placeholder="Электрондық пошта"
+                        placeholder={t("settings_email")}
                         value={profileForm.email}
                         onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
                     />
-                    <Button type="submit">Парақшаны сақтау</Button>
+                    <Button type="submit">{t("settings_save_profile")}</Button>
                 </form>
             </div>
-            <div className="settingsSection">
-                <h3>Құпиясөзді ауыстыру</h3>
+
+            <div className="settingsSection settingsSectionStack">
+                <h3>{t("settings_password_section")}</h3>
                 <form className="settingsForm" onSubmit={handlePasswordSubmit}>
-                    <Input
-                        type="password"
-                        placeholder="Ағымдағы құпиясөз"
-                        value={passwordForm.currentPassword}
-                        onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                    />
-                    <Input
-                        type="password"
-                        placeholder="Жаңа құпиясөз"
-                        value={passwordForm.newPassword}
-                        onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                    />
-                    <Button type="submit">Құпиясөзді жаңарту</Button>
+                    <div className="settingsPasswordWrap">
+                        <Input
+                            className="settingsPasswordInput"
+                            type={showPasswords.current ? "text" : "password"}
+                            placeholder={t("settings_current_password")}
+                            value={passwordForm.currentPassword}
+                            onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                        />
+                        <button
+                            type="button"
+                            className="settingsIconButton"
+                            onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
+                            aria-label={showPasswords.current ? t("auth_hide_password") : t("auth_show_password")}
+                            title={showPasswords.current ? t("auth_hide_password") : t("auth_show_password")}
+                        >
+                            {showPasswords.current ? <HiOutlineEyeSlash /> : <HiOutlineEye />}
+                        </button>
+                    </div>
+
+                    <div className="settingsPasswordWrap">
+                        <Input
+                            className="settingsPasswordInput"
+                            type={showPasswords.new ? "text" : "password"}
+                            placeholder={t("settings_new_password")}
+                            value={passwordForm.newPassword}
+                            onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                        />
+                        <button
+                            type="button"
+                            className="settingsIconButton"
+                            onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
+                            aria-label={showPasswords.new ? t("auth_hide_password") : t("auth_show_password")}
+                            title={showPasswords.new ? t("auth_hide_password") : t("auth_show_password")}
+                        >
+                            {showPasswords.new ? <HiOutlineEyeSlash /> : <HiOutlineEye />}
+                        </button>
+                    </div>
+
+                    <Button type="submit">{t("settings_save_password")}</Button>
                 </form>
             </div>
-            <StatusMessage type="success">{message}</StatusMessage>
+
             <StatusMessage type="error">{error}</StatusMessage>
         </div>
     )

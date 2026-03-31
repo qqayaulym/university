@@ -48,6 +48,16 @@ export const getMyNotifications = async (req, res) => {
   }
 };
 
+export const clearMyNotifications = async (req, res) => {
+  try {
+    await pool.query("DELETE FROM notifications WHERE user_id=$1", [req.user.id]);
+    res.json({ message: "Хабарландырулар тазартылды" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Сервер қатесі" });
+  }
+};
+
 export const markNotificationRead = async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isFinite(id)) {

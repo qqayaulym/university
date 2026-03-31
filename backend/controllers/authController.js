@@ -2,7 +2,7 @@ import { pool } from "../db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const SECRET = "mysupersecret"; 
+const SECRET = process.env.JWT_SECRET || "mysupersecret"; 
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;

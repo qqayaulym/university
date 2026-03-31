@@ -34,6 +34,9 @@ export const applyToCourse = async (req, res) => {
 
     if (existingRes.rows.length > 0) {
       const existing = existingRes.rows[0];
+      if (existing.status === "accepted") {
+        return res.status(400).json({ message: "Сіз бұл курсқа әлдеқашан қабылданғансыз" });
+      }
       if (existing.status === "pending") {
         return res.status(400).json({ message: "Өтінім бұрын жіберілген" });
       }
@@ -70,7 +73,12 @@ export const getMyApplications = async (req, res) => {
   const userId = req.user.id;
   try {
     const result = await pool.query(
-      `SELECT a.id, a.course_id, a.status, a.created_at, a.updated_at, c.name AS course_name, c.bio AS course_bio
+      `SELECT a.id, a.course_id, a.status, a.created_at, a.updated_at, c.name AS course_name, c.bio AS course_bio,
+              EXISTS (
+                SELECT 1
+                FROM course_members m
+                WHERE m.course_id = a.course_id AND m.user_id = a.user_id
+              ) AS is_member
        FROM course_applications a
        JOIN courses c ON c.id = a.course_id
        WHERE a.user_id = $1
@@ -160,6 +168,11 @@ export const updateApplicationStatus = async (req, res) => {
     }
 
     if (status === "rejected") {
+      await pool.query(
+        "DELETE FROM course_members WHERE course_id=$1 AND user_id=$2",
+        [app.course_id, app.user_id]
+      );
+
       await pool.query(
         "INSERT INTO notifications (user_id, type, message) VALUES ($1, $2, $3)",
         [app.user_id, "course_application_rejected", `Курсқа өтініміңіз қабылданбады (#${app.course_id})`]

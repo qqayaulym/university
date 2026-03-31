@@ -1,41 +1,287 @@
 .mainLayout {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 :root {
-  --bg: #f6f7fb;
-  --text: #0b1220;
-  --muted: rgba(15, 23, 42, 0.62);
-  --surface: rgba(255, 255, 255, 0.72);
-  --surface-strong: rgba(255, 255, 255, 0.92);
-  --card-bg: rgba(255, 255, 255, 0.78);
-  --card-border: rgba(15, 23, 42, 0.10);
-  --shadow: 0 18px 40px rgba(2, 6, 23, 0.10);
-  --shadow-soft: 0 10px 24px rgba(2, 6, 23, 0.08);
-  --accent: #2563eb;
-  --accent-2: #3b82f6;
-  --blur: 18px;
+  --bg: #ecf3fb;
+  --bg-2: #d9e6f5;
+  --bg-3: rgba(255, 255, 255, 0.56);
+  --text: #17324d;
+  --muted: rgba(23, 50, 77, 0.68);
+  --surface: rgba(246, 250, 255, 0.72);
+  --surface-strong: rgba(255, 255, 255, 0.88);
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --card-border: rgba(132, 156, 184, 0.24);
+  --shadow: 0 24px 60px rgba(91, 119, 147, 0.18);
+  --shadow-soft: 0 14px 30px rgba(91, 119, 147, 0.12);
+  --accent: #79a9d8;
+  --accent-2: #9ac1ea;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --info: #2563eb;
+  --blur: 22px;
 }
 
 :root[data-theme="dark"] {
-  --bg: #070a12;
-  --text: rgba(255, 255, 255, 0.92);
-  --muted: rgba(255, 255, 255, 0.62);
-  --surface: rgba(17, 25, 40, 0.62);
-  --surface-strong: rgba(17, 25, 40, 0.82);
-  --card-bg: rgba(17, 25, 40, 0.62);
-  --card-border: rgba(148, 163, 184, 0.18);
-  --shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
-  --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.42);
-  --accent: #60a5fa;
-  --accent-2: #93c5fd;
-  --blur: 18px;
+  --bg: #030712;
+  --bg-2: #0d1b33;
+  --bg-3: rgba(15, 23, 42, 0.64);
+  --text: rgba(234, 242, 255, 0.94);
+  --muted: rgba(190, 204, 227, 0.72);
+  --surface: rgba(10, 17, 29, 0.72);
+  --surface-strong: rgba(14, 23, 39, 0.88);
+  --card-bg: rgba(12, 21, 36, 0.74);
+  --card-border: rgba(101, 129, 167, 0.26);
+  --shadow: 0 28px 80px rgba(0, 0, 0, 0.46);
+  --shadow-soft: 0 16px 36px rgba(0, 0, 0, 0.34);
+  --accent: #5f88b8;
+  --accent-2: #7aa5d4;
+  --danger: #f87171;
+  --success: #4ade80;
+  --info: #60a5fa;
+  --blur: 24px;
+}
+
+html {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--bg);
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(154, 193, 234, 0.55), transparent 30%),
+    radial-gradient(circle at top right, rgba(121, 169, 216, 0.28), transparent 22%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  transition: background 0.35s ease, color 0.35s ease;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+*::selection {
+  background: rgba(121, 169, 216, 0.28);
+}
+
+.mainContent {
+  flex: 1;
+  width: 100%;
+  padding: 28px 28px 40px 300px;
+}
+
+.pageSection,
+.profileDiv,
+.coursesListDiv,
+.settingsPage {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.profileDiv,
+.settingsPage,
+.coursesListDiv {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 28px;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  padding: clamp(20px, 3vw, 34px);
+  position: relative;
+  overflow: hidden;
+}
+
+.profileDiv::before,
+.settingsPage::before,
+.coursesListDiv::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.profileUsername,
+.settingsPage h2,
+.coursesListDiv h2 {
+  margin: 0 0 18px;
+  font-size: clamp(28px, 4vw, 38px);
+  letter-spacing: -0.04em;
+}
+
+.profileSectionHeader,
+.settingsSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.profileIntro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+.profileIdentity {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(121, 169, 216, 0.18), rgba(255, 255, 255, 0.22));
+  border: 1px solid rgba(121, 169, 216, 0.2);
+}
+
+.profileMeta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.profileMetaCard {
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: var(--bg-3);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.profileMetaCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(121, 169, 216, 0.4);
+}
+
+.profileMetaIcon {
+  flex-shrink: 0;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+.profileMetaContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.profileMetaLabel {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profileMetaValue {
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.profileSectionTitle {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+
+.profileSectionHint {
+  margin: 4px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.courseCard {
+  margin-top: 12px;
+  padding: 20px;
+}
+
+.courseCard h4,
+.courseCard h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+
+.courseCard p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.courseCard p + p {
+  margin-top: 10px;
+}
+
+.emptyState {
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px dashed rgba(148, 163, 184, 0.28);
+}
+
+.emptyState p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.pillStatus {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.pillStatus.pending {
+  background: rgba(245, 158, 11, 0.14);
+  color: #b45309;
+}
+
+.pillStatus.accepted {
+  background: rgba(34, 197, 94, 0.14);
+  color: #15803d;
+}
+
+.pillStatus.rejected {
+  background: rgba(239, 68, 68, 0.14);
+  color: #b91c1c;
 }
 
 .statusText {
@@ -44,15 +290,15 @@ body {
 }
 
 .statusText.success {
-  color: #16a34a;
+  color: var(--success);
 }
 
 .statusText.error {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .statusText.info {
-  color: #2563eb;
+  color: var(--info);
 }
 
 .loaderText {
@@ -70,25 +316,85 @@ body {
   top: 16px;
   right: 16px;
   z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
 }
 
 .toastItem {
-  margin-bottom: 8px;
-  padding: 10px 12px;
-  min-width: 240px;
-  border-radius: 8px;
+  padding: 12px 14px;
+  min-width: 260px;
+  max-width: 340px;
+  border-radius: 16px;
   color: #fff;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.toastClearButton,
+.toastCloseButton {
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  cursor: pointer;
+}
+
+.toastClearButton {
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.toastCloseButton {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  flex-shrink: 0;
 }
 
 .toastItem.info {
-  background-color: #2563eb;
+  background-color: var(--info);
 }
 
 .toastItem.success {
-  background-color: #22c55e;
+  background-color: var(--success);
 }
 
 .toastItem.error {
-  background-color: #ef4444;
+  background-color: var(--danger);
+}
+
+@media (max-width: 900px) {
+  .mainContent {
+    padding: 92px 16px 28px;
+  }
+
+  .profileIntro {
+    grid-template-columns: 1fr;
+  }
+
+  .profileSectionHeader,
+  .settingsSection {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 640px) {
+  .profileMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .profileIdentity,
+  .profileMetaCard,
+  .emptyState,
+  .courseCard {
+    padding: 18px;
+  }
 }

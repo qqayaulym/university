@@ -5,9 +5,11 @@ import StatusMessage from "../components/ui/StatusMessage";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { useI18n } from "../contexts/I18nContext";
+import { useToast } from "../components/ToastProvider";
 
 const Notifications = () => {
   const { t } = useI18n();
+  const { showToast } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -82,9 +84,25 @@ const Notifications = () => {
     }
   };
 
+  const clearAll = async () => {
+    try {
+      await api.delete("/notifications/my");
+      setNotifications([]);
+      showToast(t("notifications_clear"), "success");
+    } catch (err) {
+      showToast(err.response?.data?.message || "Не удалось очистить уведомления", "error");
+    }
+  };
+
   return (
     <div className="notificationsPage">
       <h2>{t("notifications_title")}</h2>
+
+      {notifications.length > 0 && (
+        <Button variant="secondary" onClick={clearAll}>
+          {t("notifications_clear")}
+        </Button>
+      )}
 
       {loading && <Loader />}
       <StatusMessage type="error">{error}</StatusMessage>

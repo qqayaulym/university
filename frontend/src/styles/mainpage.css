@@ -1,139 +1,117 @@
-.main {
-    min-height: 100vh;
+.mainPageShell {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 24px;
+}
+
+.mainHero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.95fr);
+    gap: 24px;
+    align-items: stretch;
+    padding: clamp(22px, 4vw, 38px);
+    border-radius: 34px;
+}
+
+.mainHeroContent {
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    padding: clamp(20px, 5vw, 60px);
-    max-width: 1000px;
-    margin: 0 auto;
-    text-align: center;
-    animation: fadeIn 0.8s ease-out;
+}
+
+.mainBadge {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(121, 169, 216, 0.16);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 16px;
 }
 
 .mainH2 {
-    color: #13265c;
-    font-size: clamp(24px, 5vw, 42px);
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 20px;
-    letter-spacing: -0.04em;
+    margin: 0 0 16px;
+    color: var(--text);
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.06em;
 }
 
 .mainP {
-    color: #13265c;
+    margin: 0;
+    color: var(--muted);
     font-size: clamp(16px, 2vw, 18px);
+    line-height: 1.7;
+    max-width: 660px;
+}
+
+.mainActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.mainVisual {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+.mainStatCard {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+    justify-content: space-between;
+}
+
+.statIcon {
+    color: var(--accent);
+    margin-bottom: 4px;
+}
+
+.statIcon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.mainStatCard strong {
+    font-size: 18px;
+    letter-spacing: -0.03em;
+}
+
+.mainStatCard p,
+.mainWeekItem p {
+    color: var(--muted);
     line-height: 1.6;
-    max-width: 700px;
-    margin-bottom: 40px;
 }
 
-.mainPhoto {
-    width: 100%;
-    max-width: 800px;
-    height: clamp(200px, 40vh, 450px);
-    background: #e2e8f0; 
-    border-radius: clamp(20px, 4vw, 40px);
-    object-fit: cover;
-    margin-bottom: 50px;
-    box-shadow: 0 20px 40px rgba(185, 193, 208, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.mainSectionGrid {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 14px;
-    margin: 10px 0 30px;
-}
-
-.mainCourseCard {
-    text-align: left;
-}
-
-.mainWeekGrid {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 14px;
-    margin: 10px 0 30px;
-}
-
-.mainWeekDay {
-    text-align: left;
-}
-
-.mainWeekItem {
-    padding: 8px 0;
-    border-top: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-.activitiesButton, .aituButton {
-    width: 100%;
-    max-width: 320px;
-    padding: 18px 30px;
-    border-radius: 20px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    border: none;
-    margin: 10px 0;
-}
-
-.activitiesButton {
-    background: linear-gradient(135deg, #13265c 0%, #2563eb 100%);
-    color: white;
-    box-shadow: 0 15px 30px rgba(37, 99, 235, 0.25);
-}
-
-.activitiesButton:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(37, 99, 235, 0.35);
-}
-
+.activitiesButton,
 .aituButton {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 10px 20px rgba(185, 193, 208, 0.2);
+    width: auto;
 }
 
-.aituButton a {
-    text-decoration: none;
-    color: #13265c;
-    display: block;
-}
-
-.aituButton:hover {
-    background: #f8fafc;
-    transform: translateY(-3px);
-    border-color: #13265c;
-}
-
-.aituButton:active, .activitiesButton:active {
-    transform: scale(0.98);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@media screen and (min-width: 600px) {
-    .main {
-        padding-top: 100px; 
-    }
-    
-    .activitiesButton, .aituButton {
-        display: inline-block;
-        width: auto;
-        margin: 10px;
+@media screen and (max-width: 900px) {
+    .mainHero {
+        grid-template-columns: 1fr;
     }
 }
 
-@media screen and (max-width: 768px) {
-    .main {
-        padding-bottom: 120px; 
+@media screen and (max-width: 640px) {
+    .mainActions {
+        flex-direction: column;
+    }
+
+    .activitiesButton,
+    .aituButton {
+        width: 100%;
     }
 }
