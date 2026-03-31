@@ -62,49 +62,6 @@ const MainPage = () => {
       <h2 className="mainH2">AITU студенттік өмірінің орталығына қош келдіңіз!</h2>
       <p className="mainP">Мұнда сіз университет қабырғасында өтетін барлық қызықты іс-шараларды тауып, бірнеше секунд ішінде тіркеле аласыз. Кино кештерінен бастап, спорттық секцияларға дейін — бәрі осында!</p>
       <img className="mainPhoto" src="none" alt="" />
-      <h2 className="mainH2">Жақында болатын іс-шаралар</h2>
-
-      {loading && <Loader />}
-      <StatusMessage type="error">{error}</StatusMessage>
-
-      {!loading && !error && upcoming.length === 0 && <p>Жақында іс-шара жоқ</p>}
-
-      {!loading && !error && upcoming.length > 0 && (
-        <div className="mainSectionGrid">
-          {upcoming.map((c) => (
-            <Card key={c.id} className="mainCourseCard">
-              <h3>{c.name}</h3>
-              <p>{c.bio}</p>
-              <p>{formatDateTime(c.start_at)}</p>
-              <Button variant="secondary" onClick={() => navigate(`/course/${c.id}`)}>Толығырақ</Button>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      <h2 className="mainH2">Апталық күнтізбе</h2>
-
-      {!loading && !error && Object.keys(weekGroups).length === 0 && <p>Бұл аптаға іс-шара жоқ</p>}
-
-      {!loading && !error && Object.keys(weekGroups).length > 0 && (
-        <div className="mainWeekGrid">
-          {Object.keys(weekGroups)
-            .sort()
-            .map((day) => (
-              <Card key={day} className="mainWeekDay">
-                <h3>{day === "unknown" ? "Күні белгісіз" : day}</h3>
-                {weekGroups[day].map((c) => (
-                  <div key={c.id} className="mainWeekItem">
-                    <div>
-                      <b>{c.name}</b>
-                    </div>
-                    <div>{formatDateTime(c.start_at)}</div>
-                  </div>
-                ))}
-              </Card>
-            ))}
-        </div>
-      )}
 
       <Button className="activitiesButton" onClick={() => navigate("/course")}>Іс-шараларға өту</Button>
       <Button className="aituButton" variant="secondary" onClick={() => window.open("https://astanait.edu.kz/", "_blank")}>AITU сайтына өту</Button>

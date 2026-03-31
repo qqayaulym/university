@@ -92,39 +92,25 @@ export const getMyMemberCourses = async (req, res) => {
 };
 
 export const createNewCourse = async (req, res) => {
-  const { name, bio, startAt, endAt } = req.body;
-  const userId = req.user.id; 
+  const { name, bio } = req.body;
 
-  if (!name || name.trim() === "") {
-    return res.status(400).json({ error: "Курс атауы бос болмауы керек" });
+  if (!name?.trim() || !bio?.trim()) {
+    return res.status(400).json({ message: "Атауын мен сипаттамасын енгізіңіз" });
   }
 
-  if (!bio || bio.trim() === "") {
-    return res.status(400).json({ error: "Курс сипаттамасы бос болмауы керек" });
-  }
-
-  const start = startAt ? new Date(startAt) : null;
-  const end = endAt ? new Date(endAt) : null;
-
-  if (!start || Number.isNaN(start.getTime())) {
-    return res.status(400).json({ error: "Басталу уақыты дұрыс емес" });
-  }
-  if (endAt && (!end || Number.isNaN(end.getTime()))) {
-    return res.status(400).json({ error: "Аяқталу уақыты дұрыс емес" });
-  }
-  if (end && end.getTime() < start.getTime()) {
-    return res.status(400).json({ error: "Аяқталу уақыты басталу уақытынан ерте болмауы керек" });
+  if (!["admin", "creator"].includes(String(req.user.role).toLowerCase())) {
+    return res.status(403).json({ message: "Курс құру үшін құқықтарыңыз жоқ" });
   }
 
   try {
     const result = await pool.query(
-      "INSERT INTO courses (name, bio, user_id, start_at, end_at) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [name.trim(), bio.trim(), userId, start.toISOString(), end ? end.toISOString() : null]
+      "INSERT INTO courses (name, bio) VALUES ($1, $2) RETURNING *",
+      [name.trim(), bio.trim()]
     );
-    res.status(201).json(result.rows[0]);
+    res.status(201).json({ message: "Курс құрылды", course: result.rows[0] });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Сервер қатесі" });
+    res.status(500).json({ message: "Сервер қатесі" });
   }
 };
 

@@ -1,13 +1,11 @@
 import { Navigate } from "react-router-dom";
-import { clearAuth, getCurrentUserFromToken, isTokenExpired } from "../utils/auth";
+import { clearAuth, getCurrentUserFromToken, isTokenExpired, hasRole } from "../utils/auth";
 
 const PrivateRoute = ({ children, roles }) => {
   const token = localStorage.getItem("token");
   const user = getCurrentUserFromToken();
 
-  if (!token) {
-    return <Navigate to="/login" />;
-  }
+  if (!token) return <Navigate to="/login" />;
 
   if (isTokenExpired()) {
     clearAuth();
@@ -15,7 +13,7 @@ const PrivateRoute = ({ children, roles }) => {
   }
 
   if (roles && roles.length > 0) {
-    if (!user || !roles.includes(user.role)) {
+    if (!hasRole(roles)) {
       return <Navigate to="/" replace />;
     }
   }
