@@ -7,7 +7,6 @@ const ensureNotificationsSchema = async () => {
     await pool.query("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS is_read BOOLEAN NOT NULL DEFAULT false");
     await pool.query("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW()");
   } catch (_err) {
-    // ignore: best-effort migration
   }
 };
 

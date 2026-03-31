@@ -60,8 +60,11 @@ const MainPage = () => {
   return (
     <div className="main">
       <h2 className="mainH2">AITU студенттік өмірінің орталығына қош келдіңіз!</h2>
-      <p className="mainP">Мұнда сіз университет қабырғасында өтетін барлық қызықты іс-шараларды тауып, бірнеше секунд ішінде тіркеле аласыз. Кино кештерінен бастап, спорттық секцияларға дейін — бәрі осында!</p>
-      <img className="mainPhoto" src="none" alt="" />
+      <p className="mainP">
+        Мұнда сіз университет қабырғасында өтетін барлық қызықты іс-шараларды тауып, бірнеше секунд ішінде тіркеле аласыз. Кино кештерінен бастап, спорттық секцияларға дейін — бәрі осында!
+      </p>
+
+      <img className="none" alt="" />
 
       <Button className="activitiesButton" onClick={() => navigate("/course")}>Іс-шараларға өту</Button>
       <Button className="aituButton" variant="secondary" onClick={() => window.open("https://astanait.edu.kz/", "_blank")}>AITU сайтына өту</Button>
