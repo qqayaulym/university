@@ -7,16 +7,23 @@
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    padding: 18px 28px 18px 300px;
-    background: rgba(255, 255, 255, 0.16);
+    padding: 16px 28px 16px 300px;
+    background: rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(var(--blur));
     -webkit-backdrop-filter: blur(var(--blur));
     border-bottom: 1px solid var(--card-border);
-    box-shadow: 0 10px 30px rgba(91, 119, 147, 0.08);
+    box-shadow: 0 8px 24px rgba(91, 119, 147, 0.07);
+    transition: background 0.35s ease;
+}
+
+:root[data-theme="dark"] .header {
+    background: rgba(12, 22, 42, 0.82);
+    border-bottom-color: rgba(70, 110, 175, 0.22);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
 }
 
 .headerLogo {
-    font-size: clamp(20px, 2.5vw, 24px);
+    font-size: clamp(18px, 2.5vw, 22px);
     font-weight: 800;
     color: var(--text);
     letter-spacing: -0.04em;
@@ -33,7 +40,7 @@
 }
 
 .headerLogo:hover {
-    opacity: 0.92;
+    opacity: 0.88;
 }
 
 .headerLogo span {
@@ -41,25 +48,37 @@
 }
 
 .headerPageTitle {
-    font-size: clamp(14px, 2vw, 18px);
-    font-weight: 700;
+    font-size: clamp(13px, 1.8vw, 16px);
+    font-weight: 600;
     color: var(--muted);
     text-align: right;
-    padding: 10px 14px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.26);
-    border: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 8px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.24);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+:root[data-theme="dark"] .headerPageTitle {
+    background: rgba(40, 65, 115, 0.3);
+    border-color: rgba(80, 120, 200, 0.2);
+    color: var(--muted);
 }
 
 .footer {
     width: 100%;
     margin-top: auto;
-    padding: 18px 28px 24px 300px;
+    padding: 16px 28px 22px 300px;
     border-top: 1px solid var(--card-border);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
     display: flex;
     flex-wrap: wrap;
     gap: 8px 22px;
+    align-items: center;
+}
+
+:root[data-theme="dark"] .footer {
+    background: rgba(10, 18, 36, 0.5);
+    border-top-color: rgba(70, 110, 175, 0.18);
 }
 
 .footerText {
@@ -70,19 +89,20 @@
 .footerText a {
     color: var(--text);
     text-decoration: none;
+    transition: color 0.2s;
 }
 
 .footerText a:hover {
+    color: var(--accent);
     text-decoration: underline;
 }
 
 @media (max-width: 900px) {
     .header {
-        padding: 18px 16px 18px 86px;
+        padding: 16px 16px 16px 86px;
     }
-
     .footer {
-        padding: 18px 16px 24px;
+        padding: 16px 16px 22px;
     }
 }
 
@@ -91,9 +111,11 @@
         align-items: flex-start;
         flex-direction: column;
         gap: 8px;
+        padding-top: 14px;
+        padding-bottom: 14px;
     }
-
     .headerPageTitle {
         text-align: left;
+        align-self: flex-start;
     }
 }

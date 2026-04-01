@@ -15,14 +15,14 @@
 
 .adminHero h2 {
   margin: 8px 0 12px;
-  font-size: clamp(30px, 4vw, 42px);
+  font-size: clamp(28px, 4vw, 40px);
   letter-spacing: -0.05em;
 }
 
 .adminEyebrow {
   margin: 0;
   color: var(--accent);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -33,6 +33,7 @@
   max-width: 760px;
   color: var(--muted);
   line-height: 1.7;
+  font-size: 15px;
 }
 
 .adminHelpCard,
@@ -41,10 +42,19 @@
 .adminUserCard {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 26px;
+  border-radius: 24px;
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(var(--blur));
   -webkit-backdrop-filter: blur(var(--blur));
+  transition: border-color 0.2s;
+}
+
+:root[data-theme="dark"] .adminHelpCard,
+:root[data-theme="dark"] .adminStatCard,
+:root[data-theme="dark"] .adminUsersSection,
+:root[data-theme="dark"] .adminUserCard {
+  background: rgba(16, 28, 54, 0.82);
+  border-color: rgba(70, 110, 175, 0.22);
 }
 
 .adminHelpCard {
@@ -54,7 +64,7 @@
 .adminHelpCard h3,
 .adminSectionTop h3 {
   margin: 0 0 10px;
-  font-size: 20px;
+  font-size: 19px;
   letter-spacing: -0.03em;
 }
 
@@ -62,7 +72,7 @@
   margin: 0;
   padding-left: 20px;
   color: var(--muted);
-  line-height: 1.7;
+  line-height: 1.8;
 }
 
 .adminStatsGrid {
@@ -80,12 +90,15 @@
 
 .adminStatCard span {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .adminStatCard strong {
   color: var(--text);
-  font-size: clamp(26px, 4vw, 36px);
+  font-size: clamp(24px, 3.5vw, 34px);
   letter-spacing: -0.04em;
 }
 
@@ -102,14 +115,15 @@
 }
 
 .adminSectionTop p {
-  margin: 0;
+  margin: 4px 0 0;
   color: var(--muted);
   line-height: 1.6;
+  font-size: 14px;
 }
 
 .adminUserList {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .adminUserCard {
@@ -124,13 +138,15 @@
 }
 
 .adminUserIdentity h4 {
-  margin: 0 0 6px;
-  font-size: 18px;
+  margin: 0 0 5px;
+  font-size: 17px;
+  letter-spacing: -0.02em;
 }
 
 .adminUserIdentity p {
   margin: 0;
   color: var(--muted);
+  font-size: 14px;
 }
 
 .adminRoleBadge,
@@ -138,35 +154,58 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .adminRoleBadge-user {
-  background: rgba(148, 163, 184, 0.15);
-  color: var(--text);
+  background: rgba(148, 163, 184, 0.14);
+  color: var(--muted);
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .adminRoleBadge-creator {
-  background: rgba(96, 165, 250, 0.16);
+  background: rgba(96, 165, 250, 0.14);
   color: #3b82f6;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+:root[data-theme="dark"] .adminRoleBadge-creator {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.18);
 }
 
 .adminRoleBadge-admin {
-  background: rgba(167, 139, 250, 0.16);
+  background: rgba(167, 139, 250, 0.14);
   color: #7c3aed;
+  border: 1px solid rgba(167, 139, 250, 0.2);
+}
+
+:root[data-theme="dark"] .adminRoleBadge-admin {
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.18);
 }
 
 .adminUserFooter {
-  margin-top: 16px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--card-border);
 }
 
 .adminCurrentUserBadge {
-  background: rgba(34, 197, 94, 0.14);
+  background: rgba(34, 197, 94, 0.12);
   color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+:root[data-theme="dark"] .adminCurrentUserBadge {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.16);
 }
 
 .adminDashboardRoleActions {
@@ -176,18 +215,17 @@
 }
 
 .adminRoleButton {
-  min-height: 42px;
+  min-height: 40px;
 }
 
 .adminRoleButtonPrimary {
-  box-shadow: 0 10px 24px rgba(95, 136, 184, 0.24);
+  box-shadow: 0 8px 20px rgba(95, 136, 184, 0.24);
 }
 
 @media (max-width: 960px) {
   .adminHero {
     grid-template-columns: 1fr;
   }
-
   .adminStatsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -195,18 +233,21 @@
 
 @media (max-width: 640px) {
   .adminStatsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
-
   .adminUsersSection {
     padding: 16px;
   }
-
   .adminUserMain {
     flex-direction: column;
   }
-
   .adminDashboardRoleActions {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 420px) {
+  .adminStatsGrid {
+    grid-template-columns: 1fr;
   }
 }

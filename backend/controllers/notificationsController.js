@@ -1,11 +1,11 @@
-import { pool } from "../db.js";
+import sql from "../db.js";
 
 const ensureNotificationsSchema = async () => {
   try {
-    await pool.query("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS type VARCHAR(50)");
-    await pool.query("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS message TEXT");
-    await pool.query("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS is_read BOOLEAN NOT NULL DEFAULT false");
-    await pool.query("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW()");
+    await sql`ALTER TABLE notifications ADD COLUMN IF NOT EXISTS type VARCHAR(50)`;
+    await sql`ALTER TABLE notifications ADD COLUMN IF NOT EXISTS message TEXT`;
+    await sql`ALTER TABLE notifications ADD COLUMN IF NOT EXISTS is_read BOOLEAN NOT NULL DEFAULT false`;
+    await sql`ALTER TABLE notifications ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW()`;
   } catch (_err) {
   }
 };
@@ -16,29 +16,27 @@ export const getMyNotifications = async (req, res) => {
     const afterId = afterIdRaw !== undefined ? Number(afterIdRaw) : null;
 
     try {
-      const result = await pool.query(
-        `SELECT id, type, message, is_read, created_at
+      const result = await sql`
+        SELECT id, type, message, is_read, created_at
          FROM notifications
-         WHERE user_id=$1
-           AND ($2::int IS NULL OR id > $2)
+         WHERE user_id=${req.user.id}
+           AND (${Number.isFinite(afterId) ? sql`id > ${afterId}` : sql`true`})
          ORDER BY id ASC
-         LIMIT 50`,
-        [req.user.id, Number.isFinite(afterId) ? afterId : null]
-      );
-      return res.json(result.rows);
+         LIMIT 50
+      `;
+      return res.json(result);
     } catch (err) {
       if (err && err.code === "42703") {
         await ensureNotificationsSchema();
-        const result = await pool.query(
-          `SELECT id, type, message, is_read, created_at
+        const result = await sql`
+          SELECT id, type, message, is_read, created_at
            FROM notifications
-           WHERE user_id=$1
-             AND ($2::int IS NULL OR id > $2)
+           WHERE user_id=${req.user.id}
+             AND (${Number.isFinite(afterId) ? sql`id > ${afterId}` : sql`true`})
            ORDER BY id ASC
-           LIMIT 50`,
-          [req.user.id, Number.isFinite(afterId) ? afterId : null]
-        );
-        return res.json(result.rows);
+           LIMIT 50
+        `;
+        return res.json(result);
       }
       throw err;
     }
@@ -50,7 +48,7 @@ export const getMyNotifications = async (req, res) => {
 
 export const clearMyNotifications = async (req, res) => {
   try {
-    await pool.query("DELETE FROM notifications WHERE user_id=$1", [req.user.id]);
+    await sql`DELETE FROM notifications WHERE user_id=${req.user.id}`;
     res.json({ message: "Хабарландырулар тазартылды" });
   } catch (err) {
     console.error(err);
@@ -67,27 +65,25 @@ export const markNotificationRead = async (req, res) => {
   try {
     let updated;
     try {
-      updated = await pool.query(
-        "UPDATE notifications SET is_read=true WHERE id=$1 AND user_id=$2 RETURNING id, type, message, is_read, created_at",
-        [id, req.user.id]
-      );
+      updated = await sql`
+        UPDATE notifications SET is_read=true WHERE id=${id} AND user_id=${req.user.id} RETURNING id, type, message, is_read, created_at
+      `;
     } catch (err) {
       if (err && err.code === "42703") {
         await ensureNotificationsSchema();
-        updated = await pool.query(
-          "UPDATE notifications SET is_read=true WHERE id=$1 AND user_id=$2 RETURNING id, type, message, is_read, created_at",
-          [id, req.user.id]
-        );
+        updated = await sql`
+          UPDATE notifications SET is_read=true WHERE id=${id} AND user_id=${req.user.id} RETURNING id, type, message, is_read, created_at
+        `;
       } else {
         throw err;
       }
     }
 
-    if (updated.rows.length === 0) {
+    if (updated.length === 0) {
       return res.status(404).json({ message: "Хабарландыру табылмады" });
     }
 
-    res.json(updated.rows[0]);
+    res.json(updated[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Сервер қатесі" });

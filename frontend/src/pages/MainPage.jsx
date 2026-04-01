@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useEffect, useMemo, useState } from "react";
-import { Calendar, TrendingUp, Users, ArrowRight, ExternalLink } from "lucide-react"
+import { Calendar, TrendingUp, Users, ArrowRight, ExternalLink, User, Clock, Tag } from "lucide-react"
 import "../styles/mainpage.css"
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
@@ -39,6 +39,26 @@ const MainPage = () => {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const formatDate = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleDateString(lang === "kk" ? "kk-KZ" : lang === "ru" ? "ru-RU" : "en-US", {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const isDeadlineNear = (deadline) => {
+    if (!deadline) return false;
+    const deadlineDate = new Date(deadline);
+    const now = new Date();
+    const diffTime = deadlineDate - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 7 && diffDays >= 0;
   };
 
   const formatDay = (dateKey) => {
@@ -135,6 +155,22 @@ const MainPage = () => {
                       {course.start_at ? <span>{formatDateTime(course.start_at)}</span> : null}
                     </div>
                     <p>{course.bio || t("courses_no_description")}</p>
+                    
+                    <div className="course-meta">
+                      {course.author && (
+                        <div className="meta-item">
+                          <User size={16} />
+                          <span>{course.author}</span>
+                        </div>
+                      )}
+                      {course.deadline && (
+                        <div className={`meta-item ${isDeadlineNear(course.deadline) ? 'deadline-near' : ''}`}>
+                          <Clock size={16} />
+                          <span>Дедлайн: {formatDate(course.deadline)}</span>
+                        </div>
+                      )}
+                    </div>
+                    
                     <Button variant="secondary" icon={ArrowRight} onClick={() => navigate(`/course/${course.id}`)}>
                       {t("home_open_course")}
                     </Button>
@@ -164,6 +200,12 @@ const MainPage = () => {
                       <div key={item.id} className="mainWeekItem">
                         <strong>{item.name}</strong>
                         <p>{formatDateTime(item.start_at)}</p>
+                        {item.author && (
+                          <div className="week-item-author">
+                            <User size={14} />
+                            <span>{item.author}</span>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </Card>

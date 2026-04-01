@@ -7,7 +7,10 @@ import {
   createNewCourse, 
   updateCourse, 
   deleteCourse, 
-  showCourse 
+  showCourse,
+  getCoursesByDateRange,
+  getNewCourses,
+  getCoursesWithStatus
 } from "../controllers/coursesController.js";
 
 import { authMiddleware } from "../middleware/authMiddleware.js";
@@ -23,6 +26,12 @@ router.get("/my", authMiddleware, getMyMemberCourses)
 router.get("/upcoming", getUpcomingCourses)
 
 router.get("/week", getWeekCourses)
+
+router.get("/date-range", getCoursesByDateRange)
+
+router.get("/new", getNewCourses)
+
+router.get("/with-status", authMiddleware, getCoursesWithStatus)
 
 router.get("/", showAllCourses)
 

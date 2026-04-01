@@ -1,11 +1,16 @@
-import express from "express"
-import cors from "cors"
+import dotenv from "dotenv";
+dotenv.config();
+
+console.log("DATABASE_URL:", process.env.DATABASE_URL);
+
+import express from "express";
+import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import authRoutes from "./routes/auth.js"
-import { pool } from "./db.js"
+import authRoutes from "./routes/auth.js";
+import sql from "./db.js";
 import { initDb } from "./dbInit.js";
-import coursesRoutes from "./routes/courses.js"
+import coursesRoutes from "./routes/courses.js";
 import adminRoutes from "./routes/admin.js";
 import courseApplicationsRoutes from "./routes/courseApplications.js";
 import notificationsRoutes from "./routes/notifications.js";
@@ -14,24 +19,19 @@ import profileRoutes from "./routes/profile.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express()
+const app = express();
 const PORT = process.env.PORT || 8000;
 
-app.use(cors())
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.use("/api/auth", authRoutes)
-
-app.use("/api/courses", coursesRoutes)
-
+app.use("/api/auth", authRoutes);
+app.use("/api/courses", coursesRoutes);
 app.use("/api/course-applications", courseApplicationsRoutes);
-
 app.use("/api/notifications", notificationsRoutes);
-
 app.use("/api/profile", profileRoutes);
-
 app.use("/api/admin", adminRoutes);
 
 app.get("/health", (_req, res) => {
@@ -46,21 +46,26 @@ process.on("uncaughtException", (err) => {
   console.error("Uncaught exception:", err);
 });
 
-pool
-  .query("SELECT 1")
-  .then(() => console.log("PostgreSQL connection: OK"))
-  .catch((err) => console.error("PostgreSQL connection failed:", err.message));
+// Test Neon connection
+sql`SELECT 1`
+  .then(() => {
+    console.log("Neon PostgreSQL connection: OK");
 
-const start = async () => {
-  await initDb();
+    const start = async () => {
+      await initDb();
 
-  const server = app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+      const server = app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+
+      server.on("error", (err) => {
+        console.error("HTTP server error:", err);
+      });
+    };
+
+    start();
+  })
+  .catch((err) => {
+    console.error("Neon connection failed:", err.message);
+    process.exit(1);
   });
-
-  server.on("error", (err) => {
-    console.error("HTTP server error:", err);
-  });
-};
-
-start();

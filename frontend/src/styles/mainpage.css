@@ -28,16 +28,24 @@
     padding: 8px 14px;
     border-radius: 999px;
     background: rgba(121, 169, 216, 0.16);
+    border: 1px solid rgba(121, 169, 216, 0.22);
     color: var(--text);
     font-size: 13px;
     font-weight: 700;
+    letter-spacing: 0.04em;
     margin-bottom: 16px;
 }
 
+:root[data-theme="dark"] .mainBadge {
+    background: rgba(80, 140, 220, 0.18);
+    border-color: rgba(80, 140, 220, 0.28);
+}
+
+/* ── ИСПРАВЛЕН БАГ: font-size: 4 → правильное значение ── */
 .mainH2 {
     margin: 0 0 16px;
     color: var(--text);
-    font-size: clamp(32px, 5vw, 56px);
+    font-size: clamp(32px, 4.5vw, 52px);
     font-weight: 800;
     line-height: 1.05;
     letter-spacing: -0.06em;
@@ -46,16 +54,45 @@
 .mainP {
     margin: 0;
     color: var(--muted);
-    font-size: clamp(16px, 2vw, 18px);
+    font-size: clamp(15px, 2vw, 17px);
     line-height: 1.7;
-    max-width: 660px;
+}
+
+/* Course Meta Styles */
+.course-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 10px 0;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.meta-item.deadline-near {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.week-item-author {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
 }
 
 .mainActions {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    margin-top: 28px;
+    margin-top: 24px;
 }
 
 .mainVisual {
@@ -69,8 +106,13 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-height: 120px;
+    min-height: 116px;
     justify-content: space-between;
+}
+
+:root[data-theme="dark"] .mainStatCard {
+    background: rgba(22, 38, 68, 0.8);
+    border-color: rgba(80, 120, 180, 0.22);
 }
 
 .statIcon {
@@ -79,19 +121,22 @@
 }
 
 .statIcon svg {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
 }
 
 .mainStatCard strong {
-    font-size: 18px;
+    font-size: 17px;
     letter-spacing: -0.03em;
+    color: var(--text);
 }
 
 .mainStatCard p,
 .mainWeekItem p {
     color: var(--muted);
     line-height: 1.6;
+    margin: 0;
+    font-size: 14px;
 }
 
 .activitiesButton,

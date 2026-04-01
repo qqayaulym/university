@@ -2,7 +2,7 @@
   border: 1px solid transparent;
   border-radius: 18px;
   min-height: 46px;
-  padding: 12px 16px;
+  padding: 12px 18px;
   cursor: pointer;
   font-weight: 700;
   font-size: 14px;
@@ -17,12 +17,17 @@
 .uiButton-primary {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #fff;
-  box-shadow: 0 14px 30px rgba(95, 136, 184, 0.22);
+  box-shadow: 0 10px 24px rgba(95, 136, 184, 0.28);
 }
 
 .uiButton-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 18px 34px rgba(95, 136, 184, 0.28);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(95, 136, 184, 0.34);
+  filter: brightness(1.06);
+}
+
+:root[data-theme="dark"] .uiButton-primary {
+  box-shadow: 0 10px 28px rgba(60, 110, 200, 0.38);
 }
 
 .uiButton-secondary {
@@ -36,14 +41,24 @@
   transform: translateY(-1px);
 }
 
+:root[data-theme="dark"] .uiButton-secondary {
+  background: rgba(40, 65, 110, 0.42);
+  border-color: rgba(80, 120, 180, 0.3);
+}
+
+:root[data-theme="dark"] .uiButton-secondary:hover {
+  background: rgba(50, 80, 135, 0.6);
+}
+
 .uiButton-danger {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #fff;
-  box-shadow: 0 14px 28px rgba(220, 38, 38, 0.22);
+  box-shadow: 0 10px 24px rgba(220, 38, 38, 0.28);
 }
 
 .uiButton-danger:hover {
   transform: translateY(-1px);
+  filter: brightness(1.06);
 }
 
 .uiButton-ghost {
@@ -56,16 +71,21 @@
   background: rgba(148, 163, 184, 0.12);
 }
 
+:root[data-theme="dark"] .uiButton-ghost:hover {
+  background: rgba(80, 120, 180, 0.14);
+}
+
 .uiButton:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(121, 169, 216, 0.18);
+  box-shadow: 0 0 0 4px rgba(121, 169, 216, 0.22);
 }
 
 .uiButton:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 .buttonIcon {
@@ -76,11 +96,16 @@
   border: 1px solid var(--card-border);
   border-radius: 18px;
   min-height: 48px;
-  padding: 12px 14px;
+  padding: 12px 16px;
   min-width: 200px;
   background: rgba(255, 255, 255, 0.48);
   color: var(--text);
+  font-size: 15px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.uiInput::placeholder {
+  color: var(--muted);
 }
 
 .uiInput:focus {
@@ -90,13 +115,26 @@
   box-shadow: 0 0 0 4px rgba(121, 169, 216, 0.16);
 }
 
+/* ── Тёмная тема: инпуты читаемые ── */
+:root[data-theme="dark"] .uiInput {
+  background: rgba(18, 30, 55, 0.75);
+  border-color: rgba(80, 120, 180, 0.28);
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .uiInput:focus {
+  background: rgba(22, 38, 70, 0.95);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(80, 140, 220, 0.16);
+}
+
 .uiCard {
   border: 1px solid var(--card-border);
   border-radius: 24px;
   background: var(--card-bg);
   backdrop-filter: blur(var(--blur));
   -webkit-backdrop-filter: blur(var(--blur));
-  padding: 18px;
+  padding: 20px;
   box-shadow: var(--shadow-soft);
   transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
 }
@@ -105,4 +143,13 @@
   transform: translateY(-2px);
   border-color: rgba(121, 169, 216, 0.34);
   box-shadow: var(--shadow);
+}
+
+:root[data-theme="dark"] .uiCard {
+  background: rgba(18, 30, 55, 0.82);
+  border-color: rgba(70, 110, 175, 0.24);
+}
+
+:root[data-theme="dark"] .uiCard:hover {
+  border-color: rgba(90, 140, 220, 0.38);
 }

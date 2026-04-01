@@ -33,6 +33,13 @@
     z-index: 1900;
 }
 
+/* Тёмная тема: чуть светлее поверхность чтобы отличался от фона */
+:root[data-theme="dark"] .navBar {
+    background: rgba(22, 35, 62, 0.92);
+    border-color: rgba(80, 120, 180, 0.28);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(100, 160, 255, 0.1);
+}
+
 .navBar.closed {
     transform: translateX(calc(-100% - 24px));
 }
@@ -46,6 +53,7 @@
     color: var(--text);
     font-size: 22px;
     letter-spacing: -0.04em;
+    font-weight: 800;
 }
 
 .navSubtitle {
@@ -57,9 +65,22 @@
 .navLinks {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     overflow-y: auto;
     padding-right: 4px;
+    flex: 1;
+}
+
+/* Скролл в навбаре */
+.navLinks::-webkit-scrollbar {
+    width: 4px;
+}
+.navLinks::-webkit-scrollbar-track {
+    background: transparent;
+}
+.navLinks::-webkit-scrollbar-thumb {
+    background: var(--card-border);
+    border-radius: 999px;
 }
 
 .navList {
@@ -67,60 +88,81 @@
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
-    padding: 14px 16px;
-    border-radius: 20px;
+    padding: 12px 16px;
+    border-radius: 18px;
     transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.04);
+    background: transparent;
+    white-space: nowrap;
 }
 
 .navIcon {
     flex-shrink: 0;
-    opacity: 0.85;
+    opacity: 0.75;
     transition: opacity 0.2s ease;
+    width: 20px;
+    height: 20px;
+}
+
+/* ── ИСПРАВЛЕН БАГ: текст навбара был скрыт (display:none) ── */
+.navListText {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .navList:hover {
-    background: rgba(148, 163, 184, 0.14);
-    transform: translateX(4px);
+    background: rgba(148, 163, 184, 0.12);
+    transform: translateX(3px);
+}
+
+:root[data-theme="dark"] .navList:hover {
+    background: rgba(80, 130, 200, 0.14);
 }
 
 .navList.active {
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: #ffffff;
-    box-shadow: 0 14px 30px rgba(95, 136, 184, 0.26);
+    box-shadow: 0 10px 24px rgba(95, 136, 184, 0.3);
 }
 
 .navList.active .navIcon {
     opacity: 1;
 }
 
-.navListText {
-    line-height: 1.3;
+:root[data-theme="dark"] .navList.active {
+    box-shadow: 0 10px 28px rgba(60, 110, 200, 0.4);
 }
 
 .navLogOutButton {
     margin-top: auto;
-    padding: 14px 16px;
-    background-color: rgba(239, 68, 68, 0.12);
-    color: var(--text);
-    border: 1px solid rgba(239, 68, 68, 0.22);
-    border-radius: 20px;
+    padding: 13px 16px;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 18px;
     font-weight: 700;
     font-size: 14px;
     cursor: pointer;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 .navLogOutButton:hover {
     background-color: rgba(239, 68, 68, 0.18);
-    transform: translateY(-2px);
+    border-color: rgba(239, 68, 68, 0.36);
+    transform: translateY(-1px);
+}
+
+:root[data-theme="dark"] .navLogOutButton {
+    background-color: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.25);
 }
 
 .navToggleButton {
@@ -128,9 +170,9 @@
     top: 18px;
     left: 18px;
     z-index: 1950;
-    min-width: 92px;
+    width: 46px;
     height: 46px;
-    padding: 0 16px;
+    padding: 0;
     background: var(--surface-strong);
     border: 1px solid var(--card-border);
     color: var(--text);
@@ -139,11 +181,9 @@
     box-shadow: var(--shadow-soft);
     backdrop-filter: blur(var(--blur));
     -webkit-backdrop-filter: blur(var(--blur));
-    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
     transition: transform 0.2s ease, background 0.2s ease;
 }
 
@@ -160,10 +200,6 @@
     .navToggleButton {
         left: 242px;
         min-width: 86px;
-    }
-
-    .navBar.closed + * {
-        pointer-events: none;
     }
 }
 
@@ -192,6 +228,6 @@
     }
 
     .navList {
-        padding: 13px 14px;
+        padding: 12px 14px;
     }
 }

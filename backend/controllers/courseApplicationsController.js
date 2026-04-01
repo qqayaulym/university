@@ -1,4 +1,4 @@
-import { pool } from "../db.js";
+import sql from "../db.js";
 
 const ALLOWED_STATUS = ["pending", "accepted", "rejected"];
 
@@ -11,29 +11,23 @@ export const applyToCourse = async (req, res) => {
   }
 
   try {
-    const courseRes = await pool.query("SELECT id, user_id FROM courses WHERE id=$1", [courseId]);
-    const course = courseRes.rows[0];
+    const courseRes = await sql`SELECT id, who_created FROM courses WHERE id=${courseId}`;
+    const course = courseRes[0];
     if (!course) return res.status(404).json({ message: "Курс табылмады" });
 
-    if (Number(course.user_id) === Number(userId)) {
+    if (Number(course.who_created) === Number(userId)) {
       return res.status(400).json({ message: "Өзіңіздің курсыңызға өтінім жіберуге болмайды" });
     }
 
-    const memberRes = await pool.query(
-      "SELECT 1 FROM course_members WHERE course_id=$1 AND user_id=$2",
-      [courseId, userId]
-    );
-    if (memberRes.rows.length > 0) {
+    const memberRes = await sql`SELECT 1 FROM course_members WHERE course_id=${courseId} AND user_id=${userId}`;
+    if (memberRes.length > 0) {
       return res.status(400).json({ message: "Сіз бұл курстың қатысушысы болып тұрсыз" });
     }
 
-    const existingRes = await pool.query(
-      "SELECT id, status FROM course_applications WHERE course_id=$1 AND user_id=$2",
-      [courseId, userId]
-    );
+    const existingRes = await sql`SELECT id, status FROM course_applications WHERE course_id=${courseId} AND user_id=${userId}`;
 
-    if (existingRes.rows.length > 0) {
-      const existing = existingRes.rows[0];
+    if (existingRes.length > 0) {
+      const existing = existingRes[0];
       if (existing.status === "accepted") {
         return res.status(400).json({ message: "Сіз бұл курсқа әлдеқашан қабылданғансыз" });
       }
@@ -41,28 +35,15 @@ export const applyToCourse = async (req, res) => {
         return res.status(400).json({ message: "Өтінім бұрын жіберілген" });
       }
 
-      const updated = await pool.query(
-        "UPDATE course_applications SET status='pending', updated_at=NOW() WHERE id=$1 RETURNING *",
-        [existing.id]
-      );
-      return res.status(201).json(updated.rows[0]);
+      const updated = await sql`UPDATE course_applications SET status='pending', updated_at=NOW() WHERE id=${existing.id} RETURNING *`;
+      return res.status(201).json(updated[0]);
     }
 
-    const created = await pool.query(
-      "INSERT INTO course_applications (course_id, user_id, status) VALUES ($1, $2, 'pending') RETURNING *",
-      [courseId, userId]
-    );
+    const created = await sql`INSERT INTO course_applications (course_id, user_id, status) VALUES (${courseId}, ${userId}, 'pending') RETURNING *`;
 
-    await pool.query(
-      "INSERT INTO notifications (user_id, type, message) VALUES ($1, $2, $3)",
-      [
-        course.user_id,
-        "course_application_new",
-        `Курсқа жаңа өтінім түсті (#${courseId})`,
-      ]
-    );
+    await sql`INSERT INTO notifications (user_id, type, message) VALUES (${course.who_created}, ${'course_application_new'}, ${`Курсқа жаңа өтінім түсті (#${courseId})`})`;
 
-    res.status(201).json(created.rows[0]);
+    res.status(201).json(created[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Сервер қатесі" });
@@ -72,8 +53,7 @@ export const applyToCourse = async (req, res) => {
 export const getMyApplications = async (req, res) => {
   const userId = req.user.id;
   try {
-    const result = await pool.query(
-      `SELECT a.id, a.course_id, a.status, a.created_at, a.updated_at, c.name AS course_name, c.bio AS course_bio,
+    const result = await sql`SELECT a.id, a.course_id, a.status, a.created_at, a.updated_at, c.name AS course_name, c.bio AS course_bio,
               EXISTS (
                 SELECT 1
                 FROM course_members m
@@ -81,11 +61,9 @@ export const getMyApplications = async (req, res) => {
               ) AS is_member
        FROM course_applications a
        JOIN courses c ON c.id = a.course_id
-       WHERE a.user_id = $1
-       ORDER BY a.created_at DESC`,
-      [userId]
-    );
-    res.json(result.rows);
+       WHERE a.user_id = ${userId}
+       ORDER BY a.created_at DESC`;
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Сервер қатесі" });
@@ -100,24 +78,21 @@ export const getCourseApplicationsForCreator = async (req, res) => {
   }
 
   try {
-    const courseRes = await pool.query("SELECT id, user_id FROM courses WHERE id=$1", [courseId]);
-    const course = courseRes.rows[0];
+    const courseRes = await sql`SELECT id, who_created FROM courses WHERE id=${courseId}`;
+    const course = courseRes[0];
     if (!course) return res.status(404).json({ message: "Курс табылмады" });
 
-    if (Number(course.user_id) !== Number(req.user.id) && req.user.role !== "admin") {
+    if (Number(course.who_created) !== Number(req.user.id) && req.user.role !== "admin") {
       return res.status(403).json({ message: "Қол жеткізуге тыйым салынған" });
     }
 
-    const apps = await pool.query(
-      `SELECT a.id, a.course_id, a.user_id, a.status, a.created_at, u.username, u.email
+    const apps = await sql`SELECT a.id, a.course_id, a.user_id, a.status, a.created_at, u.username, u.email
        FROM course_applications a
        JOIN users u ON u.id = a.user_id
-       WHERE a.course_id = $1
-       ORDER BY a.created_at DESC`,
-      [courseId]
-    );
+       WHERE a.course_id = ${courseId}
+       ORDER BY a.created_at DESC`;
 
-    res.json(apps.rows);
+    res.json(apps);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Сервер қатесі" });
@@ -136,50 +111,32 @@ export const updateApplicationStatus = async (req, res) => {
   }
 
   try {
-    const appRes = await pool.query(
-      `SELECT a.id, a.course_id, a.user_id, a.status, c.user_id AS creator_id
+    const appRes = await sql`SELECT a.id, a.course_id, a.user_id, a.status, c.who_created AS creator_id
        FROM course_applications a
        JOIN courses c ON c.id = a.course_id
-       WHERE a.id = $1`,
-      [applicationId]
-    );
-    const app = appRes.rows[0];
+       WHERE a.id = ${applicationId}`;
+    const app = appRes[0];
     if (!app) return res.status(404).json({ message: "Өтінім табылмады" });
 
     if (Number(app.creator_id) !== Number(req.user.id) && req.user.role !== "admin") {
       return res.status(403).json({ message: "Қол жеткізуге тыйым салынған" });
     }
 
-    const updated = await pool.query(
-      "UPDATE course_applications SET status=$1, updated_at=NOW() WHERE id=$2 RETURNING *",
-      [status, applicationId]
-    );
+    const updated = await sql`UPDATE course_applications SET status=${status}, updated_at=NOW() WHERE id=${applicationId} RETURNING *`;
 
     if (status === "accepted") {
-      await pool.query(
-        "INSERT INTO course_members (course_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
-        [app.course_id, app.user_id]
-      );
+      await sql`INSERT INTO course_members (course_id, user_id) VALUES (${app.course_id}, ${app.user_id}) ON CONFLICT DO NOTHING`;
 
-      await pool.query(
-        "INSERT INTO notifications (user_id, type, message) VALUES ($1, $2, $3)",
-        [app.user_id, "course_application_accepted", `Курсқа өтініміңіз қабылданды (#${app.course_id})`]
-      );
+      await sql`INSERT INTO notifications (user_id, type, message) VALUES (${app.user_id}, ${'course_application_accepted'}, ${`Курсқа өтініміңіз қабылданды (#${app.course_id})`})`;
     }
 
     if (status === "rejected") {
-      await pool.query(
-        "DELETE FROM course_members WHERE course_id=$1 AND user_id=$2",
-        [app.course_id, app.user_id]
-      );
+      await sql`DELETE FROM course_members WHERE course_id=${app.course_id} AND user_id=${app.user_id}`;
 
-      await pool.query(
-        "INSERT INTO notifications (user_id, type, message) VALUES ($1, $2, $3)",
-        [app.user_id, "course_application_rejected", `Курсқа өтініміңіз қабылданбады (#${app.course_id})`]
-      );
+      await sql`INSERT INTO notifications (user_id, type, message) VALUES (${app.user_id}, ${'course_application_rejected'}, ${`Курсқа өтініміңіз қабылданбады (#${app.course_id})`})`;
     }
 
-    res.json(updated.rows[0]);
+    res.json(updated[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Сервер қатесі" });

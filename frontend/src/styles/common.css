@@ -24,24 +24,25 @@
   --blur: 22px;
 }
 
+/* ── Тёмная тема: глубокий тёмно-синий, не чисто чёрный ── */
 :root[data-theme="dark"] {
-  --bg: #030712;
-  --bg-2: #0d1b33;
-  --bg-3: rgba(15, 23, 42, 0.64);
-  --text: rgba(234, 242, 255, 0.94);
-  --muted: rgba(190, 204, 227, 0.72);
-  --surface: rgba(10, 17, 29, 0.72);
-  --surface-strong: rgba(14, 23, 39, 0.88);
-  --card-bg: rgba(12, 21, 36, 0.74);
-  --card-border: rgba(101, 129, 167, 0.26);
-  --shadow: 0 28px 80px rgba(0, 0, 0, 0.46);
-  --shadow-soft: 0 16px 36px rgba(0, 0, 0, 0.34);
-  --accent: #5f88b8;
-  --accent-2: #7aa5d4;
+  --bg: #0b1220;
+  --bg-2: #0f1a2e;
+  --bg-3: rgba(20, 32, 54, 0.72);
+  --text: rgba(220, 234, 255, 0.95);
+  --muted: rgba(160, 185, 220, 0.65);
+  --surface: rgba(16, 26, 46, 0.85);
+  --surface-strong: rgba(20, 33, 58, 0.96);
+  --card-bg: rgba(18, 29, 50, 0.82);
+  --card-border: rgba(80, 120, 180, 0.22);
+  --shadow: 0 28px 80px rgba(0, 0, 0, 0.56);
+  --shadow-soft: 0 16px 36px rgba(0, 0, 0, 0.38);
+  --accent: #6ba3d6;
+  --accent-2: #88bde8;
   --danger: #f87171;
   --success: #4ade80;
   --info: #60a5fa;
-  --blur: 24px;
+  --blur: 26px;
 }
 
 html {
@@ -63,6 +64,14 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   transition: background 0.35s ease, color 0.35s ease;
   text-rendering: optimizeLegibility;
+}
+
+/* Тёмный фон с синеватым оттенком вместо чёрного */
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at top left, rgba(40, 80, 140, 0.35), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(20, 55, 110, 0.25), transparent 30%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
 }
 
 #root {
@@ -123,6 +132,12 @@ a {
   pointer-events: none;
 }
 
+:root[data-theme="dark"] .profileDiv::before,
+:root[data-theme="dark"] .settingsPage::before,
+:root[data-theme="dark"] .coursesListDiv::before {
+  background: linear-gradient(90deg, transparent, rgba(100, 160, 255, 0.18), transparent);
+}
+
 .profileUsername,
 .settingsPage h2,
 .coursesListDiv h2 {
@@ -156,6 +171,11 @@ a {
   border-radius: 24px;
   background: linear-gradient(135deg, rgba(121, 169, 216, 0.18), rgba(255, 255, 255, 0.22));
   border: 1px solid rgba(121, 169, 216, 0.2);
+}
+
+:root[data-theme="dark"] .profileIdentity {
+  background: linear-gradient(135deg, rgba(60, 110, 180, 0.18), rgba(30, 50, 90, 0.22));
+  border-color: rgba(80, 130, 200, 0.2);
 }
 
 .profileMeta {
@@ -252,6 +272,11 @@ a {
   border: 1px dashed rgba(148, 163, 184, 0.28);
 }
 
+:root[data-theme="dark"] .emptyState {
+  background: rgba(60, 90, 140, 0.08);
+  border-color: rgba(80, 120, 180, 0.22);
+}
+
 .emptyState p {
   margin: 0;
   color: var(--muted);
@@ -274,9 +299,19 @@ a {
   color: #b45309;
 }
 
+:root[data-theme="dark"] .pillStatus.pending {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+}
+
 .pillStatus.accepted {
   background: rgba(34, 197, 94, 0.14);
   color: #15803d;
+}
+
+:root[data-theme="dark"] .pillStatus.accepted {
+  background: rgba(34, 197, 94, 0.16);
+  color: #4ade80;
 }
 
 .pillStatus.rejected {
@@ -284,22 +319,19 @@ a {
   color: #b91c1c;
 }
 
+:root[data-theme="dark"] .pillStatus.rejected {
+  background: rgba(239, 68, 68, 0.16);
+  color: #f87171;
+}
+
 .statusText {
   margin-top: 10px;
   font-size: 14px;
 }
 
-.statusText.success {
-  color: var(--success);
-}
-
-.statusText.error {
-  color: var(--danger);
-}
-
-.statusText.info {
-  color: var(--info);
-}
+.statusText.success { color: var(--success); }
+.statusText.error   { color: var(--danger); }
+.statusText.info    { color: var(--info); }
 
 .loaderText {
   color: var(--muted);
@@ -358,17 +390,9 @@ a {
   flex-shrink: 0;
 }
 
-.toastItem.info {
-  background-color: var(--info);
-}
-
-.toastItem.success {
-  background-color: var(--success);
-}
-
-.toastItem.error {
-  background-color: var(--danger);
-}
+.toastItem.info    { background-color: var(--info); }
+.toastItem.success { background-color: var(--success); }
+.toastItem.error   { background-color: var(--danger); }
 
 @media (max-width: 900px) {
   .mainContent {

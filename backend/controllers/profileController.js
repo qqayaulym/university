@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import multer from "multer";
-import { pool } from "../db.js";
+import sql from "../db.js";
 
 const uploadsDir = path.join(process.cwd(), "uploads");
 
@@ -34,11 +34,8 @@ export const addProfilePhoto = async (req, res) => {
 
   try {
     const url = fileUrlFromName(req.file.filename);
-    const created = await pool.query(
-      "INSERT INTO profile_photos (user_id, url) VALUES ($1, $2) RETURNING id, url, created_at",
-      [req.user.id, url]
-    );
-    res.status(201).json(created.rows[0]);
+    const created = await sql`INSERT INTO profile_photos (user_id, url) VALUES (${req.user.id}, ${url}) RETURNING id, url, created_at`;
+    res.status(201).json(created[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Сервер қатесі" });
@@ -47,11 +44,8 @@ export const addProfilePhoto = async (req, res) => {
 
 export const getMyProfilePhotos = async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT id, url, created_at FROM profile_photos WHERE user_id=$1 ORDER BY created_at DESC",
-      [req.user.id]
-    );
-    res.json(result.rows);
+    const result = await sql`SELECT id, url, created_at FROM profile_photos WHERE user_id=${req.user.id} ORDER BY created_at DESC`;
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Сервер қатесі" });
@@ -65,16 +59,13 @@ export const deleteMyProfilePhoto = async (req, res) => {
   }
 
   try {
-    const existing = await pool.query(
-      "SELECT id, url FROM profile_photos WHERE id=$1 AND user_id=$2",
-      [id, req.user.id]
-    );
+    const existing = await sql`SELECT id, url FROM profile_photos WHERE id=${id} AND user_id=${req.user.id}`;
 
-    if (existing.rows.length === 0) {
+    if (existing.length === 0) {
       return res.status(404).json({ message: "Фото табылмады" });
     }
 
-    await pool.query("DELETE FROM profile_photos WHERE id=$1 AND user_id=$2", [id, req.user.id]);
+    await sql`DELETE FROM profile_photos WHERE id=${id} AND user_id=${req.user.id}`;
 
     res.json({ ok: true });
   } catch (err) {

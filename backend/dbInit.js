@@ -1,101 +1,74 @@
-import { pool } from "./db.js";
+import sql from "./db.js";
 
 export const initDb = async () => {
   try {
-    await pool.query(
-      `CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        role VARCHAR(20) NOT NULL DEFAULT 'user'
-      )`
-    );
+    console.log("Database initialization started...");
 
-    await pool.query(
-      `CREATE TABLE IF NOT EXISTS courses (
+    await sql`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(255),
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255),
+        role VARCHAR(50) DEFAULT 'user',
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS courses (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
-        bio TEXT NOT NULL,
-        user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        start_at TIMESTAMP
-      )`
-    );
+        bio TEXT,
+        who_created INTEGER REFERENCES users(id),
+        start_at TIMESTAMP,
+        deadline TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
 
-    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(255)");
-    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255)");
-    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS password TEXT");
-    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'user'");
-
-    await pool.query("ALTER TABLE courses ADD COLUMN IF NOT EXISTS name VARCHAR(255)");
-    await pool.query("ALTER TABLE courses ADD COLUMN IF NOT EXISTS bio TEXT");
-    await pool.query("ALTER TABLE courses ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id) ON DELETE CASCADE");
-    await pool.query("ALTER TABLE courses ADD COLUMN IF NOT EXISTS start_at TIMESTAMP");
-
-    await pool.query(
-      `CREATE TABLE IF NOT EXISTS profile_photos (
+    await sql`
+      CREATE TABLE IF NOT EXISTS course_members (
         id SERIAL PRIMARY KEY,
-        user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        url TEXT NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT NOW()
-      )`
-    );
-
-    await pool.query("ALTER TABLE profile_photos ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id) ON DELETE CASCADE");
-    await pool.query("ALTER TABLE profile_photos ADD COLUMN IF NOT EXISTS url TEXT");
-    await pool.query("ALTER TABLE profile_photos ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW()");
-
-    await pool.query(
-      `CREATE TABLE IF NOT EXISTS course_applications (
-        id SERIAL PRIMARY KEY,
-        course_id INT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-        user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        status VARCHAR(20) NOT NULL DEFAULT 'pending',
-        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        created_at TIMESTAMP DEFAULT NOW(),
         UNIQUE(course_id, user_id)
-      )`
-    );
+      )
+    `;
 
-    await pool.query("ALTER TABLE course_applications ADD COLUMN IF NOT EXISTS course_id INT REFERENCES courses(id) ON DELETE CASCADE");
-    await pool.query("ALTER TABLE course_applications ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id) ON DELETE CASCADE");
-    await pool.query("ALTER TABLE course_applications ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'pending'");
-    await pool.query("ALTER TABLE course_applications ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW()");
-    await pool.query("ALTER TABLE course_applications ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP NOT NULL DEFAULT NOW()");
-
-    await pool.query(
-      `CREATE TABLE IF NOT EXISTS course_members (
+    await sql`
+      CREATE TABLE IF NOT EXISTS course_applications (
         id SERIAL PRIMARY KEY,
-        course_id INT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-        user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-        UNIQUE(course_id, user_id)
-      )`
-    );
+        course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        status VARCHAR(50) DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
 
-    await pool.query("ALTER TABLE course_members ADD COLUMN IF NOT EXISTS course_id INT REFERENCES courses(id) ON DELETE CASCADE");
-    await pool.query("ALTER TABLE course_members ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id) ON DELETE CASCADE");
-    await pool.query("ALTER TABLE course_members ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW()");
-
-    await pool.query(
-      `CREATE TABLE IF NOT EXISTS notifications (
+    await sql`
+      CREATE TABLE IF NOT EXISTS notifications (
         id SERIAL PRIMARY KEY,
-        user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        type VARCHAR(50) NOT NULL,
-        message TEXT NOT NULL,
-        is_read BOOLEAN NOT NULL DEFAULT false,
-        created_at TIMESTAMP NOT NULL DEFAULT NOW()
-      )`
-    );
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        type VARCHAR(50),
+        message TEXT,
+        is_read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
 
-    await pool.query("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS type VARCHAR(50)");
-    await pool.query("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS message TEXT");
-    await pool.query("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS is_read BOOLEAN NOT NULL DEFAULT false");
-    await pool.query("ALTER TABLE notifications ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW()");
+    await sql`
+      CREATE TABLE IF NOT EXISTS profile_photos (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        url TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
 
-    await pool.query("CREATE UNIQUE INDEX IF NOT EXISTS users_email_unique_idx ON users(email)");
-    await pool.query("CREATE UNIQUE INDEX IF NOT EXISTS course_applications_course_user_unique_idx ON course_applications(course_id, user_id)");
-    await pool.query("CREATE UNIQUE INDEX IF NOT EXISTS course_members_course_user_unique_idx ON course_members(course_id, user_id)");
+    console.log("Database initialization completed successfully");
   } catch (err) {
     console.error("DB init failed:", err);
   }

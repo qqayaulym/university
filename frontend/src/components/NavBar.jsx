@@ -72,14 +72,14 @@ const NavBar = () => {
               >
                 {Icon && <Icon size={18} className="navIcon" />}
                 <span className="navListText">{page.name}</span>
+                {page.name}
               </NavLink>
             );
           })}
         </div>
 
         <button className="navLogOutButton" onClick={logOut}>
-          <LogOut size={18} />
-          <span>{t("nav_logout")}</span>
+          <LogOut size={22} />
         </button>
       </nav>
     </>
