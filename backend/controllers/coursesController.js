@@ -31,9 +31,9 @@ export const getUpcomingCourses = async (req, res) => {
   const limit = Number.isFinite(Number(limitRaw)) ? Math.max(1, Math.min(20, Number(limitRaw))) : 5;
 
   try {
-    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created AS author, created_at
        FROM courses
-       WHERE start_at IS NOT NULL AND start_at >= NOW()
+       WHERE deadline IS NOT NULL AND start_at >= NOW()
        ORDER BY start_at ASC
        LIMIT ${limit}`;
     const courses = await withAuthors(result);
@@ -58,12 +58,12 @@ export const getWeekCourses = async (req, res) => {
   end.setDate(end.getDate() + 7);
 
   try {
-    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created AS author, created_at
        FROM courses
-       WHERE start_at IS NOT NULL
-         AND start_at >= ${start.toISOString()}
-         AND start_at < ${end.toISOString()}
-       ORDER BY start_at ASC`;
+       WHERE deadline IS NOT NULL
+         AND deadline >= ${start.toISOString()}
+         AND deadline < ${end.toISOString()}
+       ORDER BY deadline ASC`;
     const courses = await withAuthors(result);
     res.json(courses.map(c => ({ ...c, is_new: isNew(c.created_at) })));
   } catch (err) {
@@ -171,7 +171,6 @@ export const showCourse = async (req, res) => {
 
 export const updateCourse = async (req, res) => {
   const { id } = req.params;
-  // course_type is NOT updatable after creation
   const { name, bio, startAt, deadline } = req.body;
   const userId = req.user.id;
 

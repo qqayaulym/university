@@ -114,10 +114,9 @@ const CoursesDetails = () => {
       <div className="courseDetailHeader">
         <h2>{course.name}</h2>
 
-        {/* Badges */}
         <div className="courseDetailBadges">
           {course.is_new && (
-            <span className="courseBadge courseBadgeNew">🆕 Жаңа</span>
+            <span className="courseBadge courseBadgeNew">Жаңа</span>
           )}
           {course.course_type && (
             <span className="courseBadge courseBadgeType">
@@ -129,22 +128,20 @@ const CoursesDetails = () => {
 
       <p className="courseDetailBio">{course.bio}</p>
 
-      {/* Meta info */}
       <div className="courseDetailMeta">
         {course.created_at && (
-          <p>📅 Құрылды: <b>{formatDateTime(course.created_at)}</b></p>
+          <p>Құрылды: <b>{formatDateTime(course.created_at)}</b></p>
         )}
         {course.start_at && (
-          <p>🚀 Басталу: <b>{formatDateTime(course.start_at)}</b></p>
+          <p>Басталу: <b>{formatDateTime(course.start_at)}</b></p>
         )}
         {course.author && (
-          <p>👤 Авторы: <b>{course.author}</b></p>
+          <p>Авторы: <b>{course.author}</b></p>
         )}
 
-        {/* Deadline block */}
         {course.deadline && (
           <div className={`courseDeadlineBlock ${countdown?.urgent ? "courseDeadlineUrgent" : ""} ${deadlineExpired ? "courseDeadlineExpired" : ""}`}>
-            <p>⏰ Дедлайн: <b>{formatDateTime(course.deadline)}</b></p>
+            <p>Дедлайн: <b>{formatDateTime(course.deadline)}</b></p>
             {countdown && (
               <p className="courseCountdown">{countdown.label}</p>
             )}
@@ -152,7 +149,6 @@ const CoursesDetails = () => {
         )}
       </div>
 
-      {/* Application status */}
       {myApplication?.status && (
         <p className="courseApplicationStatus">
           {t("course_application_status")}: <b>{statusLabel(myApplication.status)}</b>
@@ -162,7 +158,7 @@ const CoursesDetails = () => {
       {isAccepted && <p className="courseAlreadyMember">{t("course_already_member")}</p>}
 
       {deadlineExpired && !isAccepted && (
-        <p className="courseDeadlineExpiredNote">⛔ Дедлайн өтіп кетті — өтінім жіберу мүмкін емес</p>
+        <p className="courseDeadlineExpiredNote">Дедлайн өтіп кетті — өтінім жіберу мүмкін емес</p>
       )}
 
       <Button onClick={apply} disabled={!canApply}>

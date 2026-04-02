@@ -85,8 +85,8 @@ const MainPage = () => {
 
       try {
         const [uRes, wRes] = await Promise.all([
-          api.get("/courses/upcoming", { params: { limit: 5 } }),
-          api.get("/courses/week"),
+          api.get("/api/courses/upcoming", { params: { limit: 5 } }),
+          api.get("/api/courses/week"),
         ]);
 
         setUpcoming(Array.isArray(uRes.data) ? uRes.data : []);

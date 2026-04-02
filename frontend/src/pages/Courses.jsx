@@ -27,7 +27,6 @@ const Courses = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // Use with-status endpoint if available so we get is_new + status
         const res = await api.get("/courses/with-status").catch(() => api.get("/courses"));
         const validCourses = res.data.filter(c => c.name && c.name.trim() !== "");
         setCourses(validCourses);
@@ -41,20 +40,16 @@ const Courses = () => {
 
   const filteredCourses = useMemo(() => {
     return courses.filter(course => {
-      // Search
       if (search && !course.name.toLowerCase().includes(search.toLowerCase())) return false;
 
-      // Type filter
       if (typeFilter && course.course_type !== typeFilter) return false;
 
-      // Date range filter (by start_at)
       if (dateFrom) {
         if (!course.start_at) return false;
         if (new Date(course.start_at) < new Date(dateFrom)) return false;
       }
       if (dateTo) {
         if (!course.start_at) return false;
-        // include whole day of dateTo
         const endOfDay = new Date(dateTo);
         endOfDay.setHours(23, 59, 59, 999);
         if (new Date(course.start_at) > endOfDay) return false;
@@ -98,15 +93,8 @@ const Courses = () => {
             {filteredCourses.length > 0 ? `${filteredCourses.length}` : t("courses_empty")}
           </p>
         </div>
-
-        {hasRole(["creator", "admin"]) && (
-          <Button icon={PlusCircle} onClick={() => navigate("/createcourse")}>
-            {t("courses_create")}
-          </Button>
-        )}
       </div>
 
-      {/* ── Search + filter bar ── */}
       <div className="coursesToolbar">
         <Input
           className="coursesSearchInput"
@@ -128,7 +116,6 @@ const Courses = () => {
         </Button>
       </div>
 
-      {/* ── Filter panel ── */}
       {showFilters && (
         <div className="coursesFilterPanel">
           {/* Type */}
@@ -146,7 +133,6 @@ const Courses = () => {
             </select>
           </div>
 
-          {/* Date range */}
           <div className="coursesFilterGroup">
             <label>Басталу күні (бастап)</label>
             <Input
@@ -180,16 +166,15 @@ const Courses = () => {
 
             return (
               <Card key={course.id} className="coursesCard courseCard">
-                {/* Badge row */}
                 <div className="coursesCardBadges">
                   {course.is_new && (
-                    <span className="courseBadge courseBadgeNew">🆕 Жаңа</span>
+                    <span className="courseBadge courseBadgeNew">Жаңа | </span>
                   )}
                   {isOwn && (
-                    <span className="courseBadge courseBadgeMine">⭐ Менікі</span>
+                    <span className="courseBadge courseBadgeMine">Сіздің іс-шараңыз </span>
                   )}
                   {course.status === "my_member" && (
-                    <span className="courseBadge courseBadgeMember">✅ Қатысушы</span>
+                    <span className="courseBadge courseBadgeMember"> Қатысушы</span>
                   )}
                   {course.course_type && (
                     <span className="courseBadge courseBadgeType">
@@ -214,7 +199,7 @@ const Courses = () => {
                     {/* Deadline */}
                     {course.deadline && (
                       <p className={`coursesCardDeadline ${dl?.urgent ? "deadlineUrgent" : ""} ${dl?.expired ? "deadlineExpired" : ""}`}>
-                        ⏰ {dl?.label ?? formatDateTime(course.deadline)}
+                         {dl?.label ?? formatDateTime(course.deadline)}
                       </p>
                     )}
                   </div>

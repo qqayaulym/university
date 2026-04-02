@@ -46,7 +46,6 @@ process.on("uncaughtException", (err) => {
   console.error("Uncaught exception:", err);
 });
 
-// Test Neon connection
 sql`SELECT 1`
   .then(() => {
     console.log("Neon PostgreSQL connection: OK");
