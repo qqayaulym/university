@@ -7,6 +7,7 @@
 }
 
 .coursesFormSection {
+   flex-direction: column;
   display: flex;
   gap: 8px;
   flex-wrap: wrap;

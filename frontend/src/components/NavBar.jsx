@@ -72,7 +72,6 @@ const NavBar = () => {
               >
                 {Icon && <Icon size={18} className="navIcon" />}
                 <span className="navListText">{page.name}</span>
-                {page.name}
               </NavLink>
             );
           })}

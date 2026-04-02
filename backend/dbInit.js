@@ -23,8 +23,14 @@ export const initDb = async () => {
         who_created INTEGER REFERENCES users(id),
         start_at TIMESTAMP,
         deadline TIMESTAMP,
+        course_type VARCHAR(100),
         created_at TIMESTAMP DEFAULT NOW()
       )
+    `;
+
+    // Migration: add course_type if it doesn't exist yet
+    await sql`
+      ALTER TABLE courses ADD COLUMN IF NOT EXISTS course_type VARCHAR(100)
     `;
 
     await sql`

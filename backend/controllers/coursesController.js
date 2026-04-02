@@ -1,50 +1,43 @@
 import sql from "../db.js";
 
+const withAuthor = async (course) => {
+  const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
+  return { ...course, author: author[0]?.username || 'Белгісіз' };
+};
+
+const withAuthors = (courses) => Promise.all(courses.map(withAuthor));
+
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+const isNew = (createdAt) => {
+  if (!createdAt) return false;
+  return Date.now() - new Date(createdAt).getTime() < SEVEN_DAYS_MS;
+};
+
 export const showAllCourses = async (req, res) => {
-    try {
-        const result = await sql`SELECT id, name, bio, start_at, deadline, who_created FROM courses ORDER BY id DESC`
-        
-        // Get author information for each course
-        const coursesWithAuthors = await Promise.all(
-            result.map(async (course) => {
-                const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
-                return {
-                    ...course,
-                    author: author[0]?.username || 'Белгісіз'
-                };
-            })
-        );
-        
-        res.json(coursesWithAuthors)
-    } catch (err) {
-        console.error(err)
-        res.status(500).json({ error: "Сервер қатесі" })
-    }
-}
+  try {
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at FROM courses ORDER BY id DESC`;
+    const courses = await withAuthors(result);
+    const tagged = courses.map(c => ({ ...c, is_new: isNew(c.created_at) }));
+    res.json(tagged);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Сервер қатесі" });
+  }
+};
 
 export const getUpcomingCourses = async (req, res) => {
   const limitRaw = req.query.limit;
   const limit = Number.isFinite(Number(limitRaw)) ? Math.max(1, Math.min(20, Number(limitRaw))) : 5;
 
   try {
-    const result = await sql`SELECT id, name, bio, start_at, deadline, who_created
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at
        FROM courses
        WHERE start_at IS NOT NULL AND start_at >= NOW()
        ORDER BY start_at ASC
        LIMIT ${limit}`;
-    
-    // Get author information
-    const coursesWithAuthors = await Promise.all(
-        result.map(async (course) => {
-            const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
-            return {
-                ...course,
-                author: author[0]?.username || 'Белгісіз'
-            };
-        })
-    );
-    
-    res.json(coursesWithAuthors);
+    const courses = await withAuthors(result);
+    res.json(courses.map(c => ({ ...c, is_new: isNew(c.created_at) })));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Сервер қатесі" });
@@ -61,30 +54,18 @@ export const getWeekCourses = async (req, res) => {
 
   const start = new Date(fromDate);
   start.setHours(0, 0, 0, 0);
-
   const end = new Date(start);
   end.setDate(end.getDate() + 7);
 
   try {
-    const result = await sql`SELECT id, name, bio, start_at, deadline, who_created
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at
        FROM courses
        WHERE start_at IS NOT NULL
          AND start_at >= ${start.toISOString()}
          AND start_at < ${end.toISOString()}
        ORDER BY start_at ASC`;
-    
-    // Get author information
-    const coursesWithAuthors = await Promise.all(
-        result.map(async (course) => {
-            const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
-            return {
-                ...course,
-                author: author[0]?.username || 'Белгісіз'
-            };
-        })
-    );
-    
-    res.json(coursesWithAuthors);
+    const courses = await withAuthors(result);
+    res.json(courses.map(c => ({ ...c, is_new: isNew(c.created_at) })));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Сервер қатесі" });
@@ -93,20 +74,9 @@ export const getWeekCourses = async (req, res) => {
 
 export const getMyCreatedCourses = async (req, res) => {
   try {
-    const result = await sql`SELECT id, name, bio, start_at, deadline, who_created FROM courses WHERE who_created=${req.user.id} ORDER BY id DESC`;
-    
-    // Get author information
-    const coursesWithAuthors = await Promise.all(
-        result.map(async (course) => {
-            const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
-            return {
-                ...course,
-                author: author[0]?.username || 'Белгісіз'
-            };
-        })
-    );
-    
-    res.json(coursesWithAuthors);
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at FROM courses WHERE who_created=${req.user.id} ORDER BY id DESC`;
+    const courses = await withAuthors(result);
+    res.json(courses.map(c => ({ ...c, is_new: isNew(c.created_at) })));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Сервер қатесі" });
@@ -115,24 +85,13 @@ export const getMyCreatedCourses = async (req, res) => {
 
 export const getMyMemberCourses = async (req, res) => {
   try {
-    const result = await sql`SELECT c.id, c.name, c.bio, c.start_at, c.deadline, c.who_created
+    const result = await sql`SELECT c.id, c.name, c.bio, c.start_at, c.deadline, c.course_type, c.who_created, c.created_at
        FROM course_members m
        JOIN courses c ON c.id = m.course_id
        WHERE m.user_id=${req.user.id}
        ORDER BY m.created_at DESC`;
-    
-    // Get author information
-    const coursesWithAuthors = await Promise.all(
-        result.map(async (course) => {
-            const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
-            return {
-                ...course,
-                author: author[0]?.username || 'Белгісіз'
-            };
-        })
-    );
-    
-    res.json(coursesWithAuthors);
+    const courses = await withAuthors(result);
+    res.json(courses.map(c => ({ ...c, is_new: isNew(c.created_at) })));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Сервер қатесі" });
@@ -140,7 +99,7 @@ export const getMyMemberCourses = async (req, res) => {
 };
 
 export const createNewCourse = async (req, res) => {
-  const { name, bio, deadline } = req.body;
+  const { name, bio, deadline, course_type } = req.body;
 
   if (!name?.trim() || !bio?.trim()) {
     return res.status(400).json({ message: "Атауын мен сипаттамасын енгізіңіз" });
@@ -151,16 +110,19 @@ export const createNewCourse = async (req, res) => {
   }
 
   try {
-    const result = await sql`INSERT INTO courses (name, bio, who_created, deadline) VALUES (${name.trim()}, ${bio.trim()}, ${req.user.id}, ${deadline ? new Date(deadline).toISOString() : null}) RETURNING id, name, bio, start_at, deadline, who_created`;
-    
-    // Get author information
-    const author = await sql`SELECT username FROM users WHERE id = ${req.user.id}`;
-    const courseWithAuthor = {
-        ...result[0],
-        author: author[0]?.username || 'Белгісіз'
-    };
-    
-    res.status(201).json({ message: "Курс құрылды", course: courseWithAuthor });
+    const result = await sql`
+      INSERT INTO courses (name, bio, who_created, deadline, course_type)
+      VALUES (
+        ${name.trim()},
+        ${bio.trim()},
+        ${req.user.id},
+        ${deadline ? new Date(deadline).toISOString() : null},
+        ${course_type || null}
+      )
+      RETURNING id, name, bio, start_at, deadline, course_type, who_created, created_at
+    `;
+    const courseWithAuthor = await withAuthor(result[0]);
+    res.status(201).json({ message: "Курс құрылды", course: { ...courseWithAuthor, is_new: true } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Сервер қатесі" });
@@ -168,8 +130,8 @@ export const createNewCourse = async (req, res) => {
 };
 
 export const deleteCourse = async (req, res) => {
-  const { id } = req.params;          
-  const userId = req.user.id;        
+  const { id } = req.params;
+  const userId = req.user.id;
 
   try {
     const result = await sql`SELECT who_created FROM courses WHERE id=${id}`;
@@ -193,20 +155,14 @@ export const showCourse = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await sql`SELECT id, name, bio, start_at, deadline, who_created FROM courses WHERE id = ${id}`;
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at FROM courses WHERE id = ${id}`;
 
     if (result.length === 0) {
       return res.status(404).json({ error: "Курс табылмады" });
     }
-    
-    // Get author information
-    const author = await sql`SELECT username FROM users WHERE id = ${result[0].who_created}`;
-    const courseWithAuthor = {
-        ...result[0],
-        author: author[0]?.username || 'Белгісіз'
-    };
 
-    res.json(courseWithAuthor);
+    const courseWithAuthor = await withAuthor(result[0]);
+    res.json({ ...courseWithAuthor, is_new: isNew(result[0].created_at) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Сервер қатесі" });
@@ -215,11 +171,12 @@ export const showCourse = async (req, res) => {
 
 export const updateCourse = async (req, res) => {
   const { id } = req.params;
+  // course_type is NOT updatable after creation
   const { name, bio, startAt, deadline } = req.body;
   const userId = req.user.id;
 
   try {
-    const result = await sql`SELECT id, who_created, name, bio, start_at, deadline FROM courses WHERE id=${id}`;
+    const result = await sql`SELECT id, who_created, name, bio, start_at, deadline, course_type, created_at FROM courses WHERE id=${id}`;
     const course = result[0];
 
     if (!course) return res.status(404).json({ message: "Іс-шара табылмады" });
@@ -228,49 +185,39 @@ export const updateCourse = async (req, res) => {
       return res.status(403).json({ message: "Бөтен іс-шараны өзгерте алмайсыз" });
     }
 
-    const updated = await sql`UPDATE courses SET name=${name || course.name}, bio=${bio || course.bio}, start_at=${startAt ? new Date(startAt).toISOString() : course.start_at}, deadline=${deadline ? new Date(deadline).toISOString() : course.deadline} WHERE id=${id} RETURNING id, name, bio, start_at, deadline, who_created`;
-    
-    // Get author information
-    const author = await sql`SELECT username FROM users WHERE id = ${updated[0].who_created}`;
-    const courseWithAuthor = {
-        ...updated[0],
-        author: author[0]?.username || 'Белгісіз'
-    };
-
-    res.json(courseWithAuthor);
+    const updated = await sql`
+      UPDATE courses
+      SET
+        name = ${name || course.name},
+        bio = ${bio || course.bio},
+        start_at = ${startAt ? new Date(startAt).toISOString() : course.start_at},
+        deadline = ${deadline !== undefined ? (deadline ? new Date(deadline).toISOString() : null) : course.deadline}
+      WHERE id = ${id}
+      RETURNING id, name, bio, start_at, deadline, course_type, who_created, created_at
+    `;
+    const courseWithAuthor = await withAuthor(updated[0]);
+    res.json({ ...courseWithAuthor, is_new: isNew(updated[0].created_at) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Сервер қатесі" });
   }
 };
 
-// New endpoints for course filtering and status
 export const getCoursesByDateRange = async (req, res) => {
   const { startDate, endDate } = req.query;
-  
+
   if (!startDate || !endDate) {
     return res.status(400).json({ message: "startDate және endDate параметрлері қажет" });
   }
 
   try {
-    const result = await sql`SELECT id, name, bio, start_at, deadline, who_created
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at
        FROM courses
        WHERE start_at >= ${new Date(startDate).toISOString()}
          AND start_at <= ${new Date(endDate).toISOString()}
        ORDER BY start_at ASC`;
-    
-    // Get author information
-    const coursesWithAuthors = await Promise.all(
-        result.map(async (course) => {
-            const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
-            return {
-                ...course,
-                author: author[0]?.username || 'Белгісіз'
-            };
-        })
-    );
-    
-    res.json(coursesWithAuthors);
+    const courses = await withAuthors(result);
+    res.json(courses.map(c => ({ ...c, is_new: isNew(c.created_at) })));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Сервер қатесі" });
@@ -279,25 +226,14 @@ export const getCoursesByDateRange = async (req, res) => {
 
 export const getNewCourses = async (req, res) => {
   const days = parseInt(req.query.days) || 7;
-  
+
   try {
-    const result = await sql`SELECT id, name, bio, start_at, deadline, who_created
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at
        FROM courses
        WHERE created_at >= NOW() - INTERVAL '${days} days'
        ORDER BY created_at DESC`;
-    
-    // Get author information
-    const coursesWithAuthors = await Promise.all(
-        result.map(async (course) => {
-            const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
-            return {
-                ...course,
-                author: author[0]?.username || 'Белгісіз'
-            };
-        })
-    );
-    
-    res.json(coursesWithAuthors);
+    const courses = await withAuthors(result);
+    res.json(courses.map(c => ({ ...c, is_new: true })));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Сервер қатесі" });
@@ -306,40 +242,32 @@ export const getNewCourses = async (req, res) => {
 
 export const getCoursesWithStatus = async (req, res) => {
   const userId = req.user.id;
-  
+
   try {
-    // Get all courses with author info
-    const allCourses = await sql`SELECT id, name, bio, start_at, deadline, who_created FROM courses ORDER BY id DESC`;
-    
-    // Get user's created courses
+    const allCourses = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at FROM courses ORDER BY id DESC`;
     const createdCourses = await sql`SELECT id FROM courses WHERE who_created = ${userId}`;
-    
-    // Get user's member courses
     const memberCourses = await sql`SELECT course_id FROM course_members WHERE user_id = ${userId}`;
-    
+
     const createdIds = new Set(createdCourses.map(c => c.id));
     const memberIds = new Set(memberCourses.map(m => m.course_id));
-    
-    // Mark courses with status
+
     const coursesWithStatus = await Promise.all(
-        allCourses.map(async (course) => {
-            const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
-            
-            let status = 'available';
-            if (createdIds.has(course.id)) {
-                status = 'my_created';
-            } else if (memberIds.has(course.id)) {
-                status = 'my_member';
-            }
-            
-            return {
-                ...course,
-                author: author[0]?.username || 'Белгісіз',
-                status
-            };
-        })
+      allCourses.map(async (course) => {
+        const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
+
+        let status = 'available';
+        if (createdIds.has(course.id)) status = 'my_created';
+        else if (memberIds.has(course.id)) status = 'my_member';
+
+        return {
+          ...course,
+          author: author[0]?.username || 'Белгісіз',
+          status,
+          is_new: isNew(course.created_at)
+        };
+      })
     );
-    
+
     res.json(coursesWithStatus);
   } catch (err) {
     console.error(err);
