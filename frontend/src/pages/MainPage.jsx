@@ -21,7 +21,8 @@ const MainPage = () => {
   const weekGroups = useMemo(() => {
     const groups = {};
     (Array.isArray(week) ? week : []).forEach((c) => {
-      const d = c.start_at ? new Date(c.start_at) : null;
+      const dateSource = c.deadline || c.start_at;
+      const d = dateSource ? new Date(dateSource) : null;
       const key = d && !Number.isNaN(d.getTime()) ? d.toISOString().slice(0, 10) : "unknown";
       if (!groups[key]) groups[key] = [];
       groups[key].push(c);
@@ -155,10 +156,12 @@ const MainPage = () => {
                   <Card key={course.id} className="mainCourseCard">
                     <div className="mainCardTop">
                       <h4>{course.name}</h4>
-                      {course.start_at ? <span>{formatDateTime(course.start_at)}</span> : null}
+                      {(course.start_at || course.deadline) && (
+                        <span>{formatDateTime(course.start_at || course.deadline)}</span>
+                      )}
                     </div>
                     <p>{course.bio || t("courses_no_description")}</p>
-                    
+
                     <div className="course-meta">
                       {course.author && (
                         <div className="meta-item">
@@ -173,7 +176,7 @@ const MainPage = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     <Button variant="secondary" icon={ArrowRight} onClick={() => navigate(`/course/${course.id}`)}>
                       {t("home_open_course")}
                     </Button>
@@ -193,26 +196,28 @@ const MainPage = () => {
               </Card>
             ) : (
               <div className="mainWeekGrid">
-                {Object.entries(weekGroups).map(([day, items]) => (
-                  <Card key={day} className="mainWeekDay">
-                    <div className="mainCardTop">
-                      <h4>{formatDay(day)}</h4>
-                      <span>{t("home_week_count")}: {items.length}</span>
-                    </div>
-                    {items.map((item) => (
-                      <div key={item.id} className="mainWeekItem">
-                        <strong>{item.name}</strong>
-                        <p>{formatDateTime(item.start_at)}</p>
-                        {item.author && (
-                          <div className="week-item-author">
-                            <User size={14} />
-                            <span>{item.author}</span>
-                          </div>
-                        )}
+                {Object.entries(weekGroups)
+                  .sort(([a], [b]) => (a === "unknown" ? 1 : b === "unknown" ? -1 : a.localeCompare(b)))
+                  .map(([day, items]) => (
+                    <Card key={day} className="mainWeekDay">
+                      <div className="mainCardTop">
+                        <h4>{formatDay(day)}</h4>
+                        <span>{t("home_week_count")}: {items.length}</span>
                       </div>
-                    ))}
-                  </Card>
-                ))}
+                      {items.map((item) => (
+                        <div key={item.id} className="mainWeekItem">
+                          <strong>{item.name}</strong>
+                          <p>{formatDateTime(item.deadline || item.start_at)}</p>
+                          {item.author && (
+                            <div className="week-item-author">
+                              <User size={14} />
+                              <span>{item.author}</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </Card>
+                  ))}
               </div>
             )}
           </section>

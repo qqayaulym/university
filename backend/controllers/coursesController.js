@@ -1,6 +1,8 @@
 import sql from "../db.js";
 
 const withAuthor = async (course) => {
+  // FIX: who_created can be null — postgres throws UNDEFINED_VALUE if we query with null
+  if (!course.who_created) return { ...course, author: 'Белгісіз' };
   const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
   return { ...course, author: author[0]?.username || 'Белгісіз' };
 };
@@ -31,7 +33,7 @@ export const getUpcomingCourses = async (req, res) => {
   const limit = Number.isFinite(Number(limitRaw)) ? Math.max(1, Math.min(20, Number(limitRaw))) : 5;
 
   try {
-    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created AS author, created_at
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at
        FROM courses
        WHERE deadline IS NOT NULL AND deadline >= NOW()
        ORDER BY deadline ASC
@@ -58,7 +60,7 @@ export const getWeekCourses = async (req, res) => {
   end.setDate(end.getDate() + 7);
 
   try {
-    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created AS author, created_at
+    const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at
        FROM courses
        WHERE deadline IS NOT NULL
          AND deadline >= ${start.toISOString()}
@@ -227,9 +229,10 @@ export const getNewCourses = async (req, res) => {
   const days = parseInt(req.query.days) || 7;
 
   try {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
     const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created, created_at
        FROM courses
-       WHERE created_at >= NOW() - INTERVAL '${days} days'
+       WHERE created_at >= ${since}
        ORDER BY created_at DESC`;
     const courses = await withAuthors(result);
     res.json(courses.map(c => ({ ...c, is_new: true })));
@@ -252,7 +255,11 @@ export const getCoursesWithStatus = async (req, res) => {
 
     const coursesWithStatus = await Promise.all(
       allCourses.map(async (course) => {
-        const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
+        let authorName = 'Белгісіз';
+        if (course.who_created) {
+          const author = await sql`SELECT username FROM users WHERE id = ${course.who_created}`;
+          authorName = author[0]?.username || 'Белгісіз';
+        }
 
         let status = 'available';
         if (createdIds.has(course.id)) status = 'my_created';
@@ -260,7 +267,7 @@ export const getCoursesWithStatus = async (req, res) => {
 
         return {
           ...course,
-          author: author[0]?.username || 'Белгісіз',
+          author: authorName,
           status,
           is_new: isNew(course.created_at)
         };
