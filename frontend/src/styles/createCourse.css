@@ -22,3 +22,63 @@
 .courseCard {
   margin-top: 10px;
 }
+
+textarea {
+  width: 100%;
+  min-height: 80px;
+  max-height: 400px;
+  padding: 12px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none;
+  background-color: white;
+  color: inherit;
+  transition: all 200ms ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+textarea:hover {
+  border-color: #a0aec0;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  textarea {
+    background-color: #1f2937;
+    color: #f3f4f6;
+    border-color: #4b5563;
+  }
+
+  textarea:hover {
+    border-color: #64748b;
+  }
+
+  textarea:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+  }
+}
+
+textarea::placeholder {
+  color: #a0aec0;
+}
+
+@media (max-width: 768px) {
+  textarea {
+    min-height: 100px;
+    max-height: 300px;
+    font-size: 16px;
+    padding: 10px 8px;
+  }
+}

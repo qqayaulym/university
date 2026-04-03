@@ -84,9 +84,12 @@ const MainPage = () => {
       setError("");
 
       try {
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+
         const [uRes, wRes] = await Promise.all([
-          api.get("/api/courses/upcoming", { params: { limit: 5 } }),
-          api.get("/api/courses/week"),
+          api.get("/courses/upcoming", { params: { limit: 5 } }),
+          api.get("/courses/week", { params: { from: todayString } }),
         ]);
 
         setUpcoming(Array.isArray(uRes.data) ? uRes.data : []);

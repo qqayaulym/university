@@ -9,7 +9,6 @@ import Card from "../components/ui/Card";
 import { useI18n } from "../contexts/I18nContext";
 import "../styles/createCourse.css";
 
-// All available course types — cannot be changed after creation
 export const COURSE_TYPES = [
   { value: "sport",    label: "Спорт" },
   { value: "edu",      label: "Оқу / Білім" },
@@ -230,7 +229,6 @@ const CreateDeleteCourse = () => {
         </Button>
       </div>
 
-      {/* ── Course list ── */}
       <div>
         {courses.map(course => (
           <Card key={course.id} className="courseCard">
@@ -242,11 +240,15 @@ const CreateDeleteCourse = () => {
                   value={editForm.name}
                   onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))}
                 />
-                <Input
-                  type="text"
+                <textarea
                   placeholder={t("creator_course_bio")}
                   value={editForm.bio}
-                  onChange={e => setEditForm(p => ({ ...p, bio: e.target.value }))}
+                  onChange={e => {
+                    const textarea = e.target;
+                    setEditForm(p => ({ ...p, bio: e.target.value }));
+                    textarea.style.height = 'auto';
+                    textarea.style.height = Math.min(textarea.scrollHeight, 400) + 'px';
+                  }}
                 />
                 <label className="courseFieldLabel">Дедлайн</label>
                 <Input
@@ -254,7 +256,6 @@ const CreateDeleteCourse = () => {
                   value={editForm.deadline}
                   onChange={e => setEditForm(p => ({ ...p, deadline: e.target.value }))}
                 />
-                {/* course_type is read-only after creation */}
                 <p className="courseTypeReadonly">
                   Түрі: <b>{getCourseTypeLabel(course.course_type)}</b> (өзгертуге болмайды)
                 </p>
