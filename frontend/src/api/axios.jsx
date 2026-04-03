@@ -1,8 +1,13 @@
 import axios from "axios";
 import { getToken } from "../utils/auth";
 
+const BASE_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:8000/api"
+    : "https://university-2-gabu.onrender.com/api";
+
 const instance = axios.create({
-  baseURL: "https://university-2-gabu.onrender.com",
+  baseURL: BASE_URL,
 });
 
 instance.interceptors.request.use((config) => {
