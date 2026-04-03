@@ -33,8 +33,8 @@ export const getUpcomingCourses = async (req, res) => {
   try {
     const result = await sql`SELECT id, name, bio, start_at, deadline, course_type, who_created AS author, created_at
        FROM courses
-       WHERE deadline IS NOT NULL AND start_at >= NOW()
-       ORDER BY start_at ASC
+       WHERE deadline IS NOT NULL AND deadline >= NOW()
+       ORDER BY deadline ASC
        LIMIT ${limit}`;
     const courses = await withAuthors(result);
     res.json(courses.map(c => ({ ...c, is_new: isNew(c.created_at) })));
